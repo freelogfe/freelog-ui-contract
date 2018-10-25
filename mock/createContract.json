@@ -1,0 +1,47 @@
+{
+  "ret": 0,
+  "errcode": 0,
+  "hi": "wwzh",
+  "msg": "success",
+  "data": {
+    "contractId": "5bd0123784d149003593a702",
+    "contractClause": {
+      "authorizedObjects": [
+        {
+          "userType": "GROUP",
+          "users": [
+            "PUBLIC"
+          ]
+        }
+      ],
+      "currentFsmState": "initial",
+      "policyText": "for public:\n  initial:\n    active\n    terminate",
+      "policySegmentId": "1695c7481f58acefe31c967598000d53",
+      "fsmStates": {
+        "initial": {
+          "authorization": [
+            "active"
+          ],
+          "transition": {
+            "terminate": null
+          }
+        }
+      }
+    },
+    "contractName": "歌曲 - 薛之谦 - 你还要我怎样",
+    "remark": "",
+    "isDefault": 1,
+    "isConsumptive": 0,
+    "status": 1,
+    "segmentId": "1695c7481f58acefe31c967598000d53",
+    "targetId": "5bd00f5ef9f6cf002a823df0",
+    "partyOne": "10017",
+    "partyTwo": "10008",
+    "partyOneUserId": 10008,
+    "partyTwoUserId": 10008,
+    "resourceId": "425babee96a21278dbdd1e77b59c952bbb5757c0",
+    "contractType": 3,
+    "createDate": "2018-10-24T06:33:27.005Z",
+    "updateDate": "2018-10-24T06:33:27.005Z"
+  }
+}

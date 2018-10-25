@@ -1,0 +1,73 @@
+{
+  "ret": 0,
+  "errcode": 0,
+  "hi": "wwzh",
+  "msg": "success",
+  "data": [
+    {
+      "contractId": "5bc4600298db99002a685f61",
+      "status": 4,
+      "segmentId": "1695c7481f58acefe31c967598000d53",
+      "targetId": "5bc441aefd691b002cf3dd26",
+      "partyOne": "10017",
+      "partyTwo": "10008",
+      "partyOneUserId": 10008,
+      "partyTwoUserId": 10008,
+      "resourceId": "47fe46a5481dd2a6dd37ac28fcb90d5c459d1e99",
+      "contractType": 3,
+      "createDate": "2018-10-15T09:38:10.550Z"
+    },
+    {
+      "contractId": "5bc83e23cadab100298df3ff",
+      "status": 4,
+      "segmentId": "1695c7481f58acefe31c967598000d53",
+      "targetId": "5bc6d8a9cffc1f00293fdd98",
+      "partyOne": "10017",
+      "partyTwo": "10008",
+      "partyOneUserId": 10008,
+      "partyTwoUserId": 10008,
+      "resourceId": "1ce0f1e01fb101743b90542d1dd004d9443a91b1",
+      "contractType": 3,
+      "createDate": "2018-10-18T08:02:43.426Z"
+    },
+    {
+      "contractId": "5bc83e59cadab100298df403",
+      "status": 4,
+      "segmentId": "1695c7481f58acefe31c967598000d53",
+      "targetId": "5bc551c7fd691b002cf3dd2e",
+      "partyOne": "10017",
+      "partyTwo": "10008",
+      "partyOneUserId": 10008,
+      "partyTwoUserId": 10008,
+      "resourceId": "3302ad0d2d6015e097c2430d38d3383a06a8a3fc",
+      "contractType": 3,
+      "createDate": "2018-10-18T08:03:37.167Z"
+    },
+    {
+      "contractId": "5bcfe86384d149003593a6f9",
+      "status": 2,
+      "segmentId": "6435b37863bc1a6db18327ff00a174ee",
+      "targetId": "5bced855f9f6cf002a823dee",
+      "partyOne": "10017",
+      "partyTwo": "10008",
+      "partyOneUserId": 10008,
+      "partyTwoUserId": 10008,
+      "resourceId": "7deef54c4fdd2db159b574ab723341742492070a",
+      "contractType": 3,
+      "createDate": "2018-10-24T03:34:59.830Z"
+    },
+    {
+      "contractId": "5bd00e3a84d149003593a6fc",
+      "status": 4,
+      "segmentId": "1695c7481f58acefe31c967598000d53",
+      "targetId": "5bc468b7fd691b002cf3dd2a",
+      "partyOne": "10017",
+      "partyTwo": "10008",
+      "partyOneUserId": 10008,
+      "partyTwoUserId": 10008,
+      "resourceId": "faac06ec753ec26a23277e0b16b93f55f0e1a7d5",
+      "contractType": 3,
+      "createDate": "2018-10-24T06:16:26.595Z"
+    }
+  ]
+}
