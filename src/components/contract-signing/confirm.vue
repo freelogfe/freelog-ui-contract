@@ -17,9 +17,8 @@
         <div class="confirm-sign-contract" v-if="confirmType === 'sign-contract'">
           <div class="csn-presentable-name"><span>资源名称</span>&nbsp;&nbsp;&nbsp;&nbsp;{{presentableName}}</div>
           <div class="csn-policy-name">确认以&nbsp;&nbsp;&nbsp;&nbsp;{{policyName}}&nbsp;&nbsp;&nbsp;&nbsp;签约合约？</div>
-          <div class="csn-set-default" @click="toggleSetDefaultContract">
-            <i>+</i>
-            将此合约设定为默认合约
+          <div class="csn-set-default">
+            <el-checkbox v-model="isSetDefault">将此合约设定为默认合约</el-checkbox>
           </div>
         </div>
       </div>
@@ -35,9 +34,13 @@
 
 <script>
   import FeDialog from '../fe-dialog/fe-dialog'
+  import { Checkbox } from 'element-ui'
   export default {
     name: 'contract-confirm',
-    components: { FeDialog },
+    components: {
+      FeDialog,
+      "el-checkbox": Checkbox
+    },
     props: {
       visible: {
         type: Boolean,
@@ -59,7 +62,7 @@
     },
     methods: {
       toggleSetDefaultContract() {
-        this.isSetDefault = this.isSetDefault
+        this.isSetDefault = !this.isSetDefault
       },
       confirmCancel() {
         this.$emit('cancel')

@@ -7,48 +7,30 @@
       <el-button type="primary" @click="openMultiContract">open multi-contract</el-button>
     </el-row>
 
-
-    <fe-dialog
-            :close-on-click-modal="false"
-            :title="scTitle"
-            width="790px"
-            top="5vh"
+    <dialog-contracts-single
             :visible.sync="isShowSingleContract"
-            :beforeClose="beforeClose"
-            @close="hideAuthDialog"
-            is-destoryed-body
-    >
-      <single-contract
-              :presentable="scAuthPresentable || {}"
-              :contractIDs="scAuthContractIDs"
-              @close-dialog="hideAuthDialog"
-      ></single-contract>
-    </fe-dialog>
-    <fe-dialog
-            :close-on-click-modal="false"
-            :title="scTitle"
-            width="1000px"
-            top="5vh"
+            @close-dialog="hideAuthDialog"
+            :presentable="scAuthPresentable || {}"
+            :contractIDs="scAuthContractIDs"
+    ></dialog-contracts-single>
+
+    <dialog-contracts-multi
             :visible.sync="isShowMultiContracts"
-            @close="hideAuthDialog"
-            is-destoryed-body
-    >
-      <multi-contracts
-              :presentableList="scAuthPresentableList"
-              :contractIDs="scAuthContractIDs"
-              @close-dialog="hideAuthDialog"
-      ></multi-contracts>
-    </fe-dialog>
+            @close-dialog="hideAuthDialog"
+            :presentableList="scAuthPresentableList"
+            :contractIDs="scAuthContractIDs"
+    ></dialog-contracts-multi>
   </div>
 </template>
 
 <script>
 
  import {
-   MultiContracts,
-   SingleContract
+   DialogContractsMulti,
+   DialogContractsSingle
  } from '../src/index'
  import FeDialog from '../src/components/fe-dialog/fe-dialog'
+ import { Row, Button } from 'element-ui'
 
 export default {
   name: 'app',
@@ -64,9 +46,11 @@ export default {
     }
   },
   components: {
-    MultiContracts,
-    SingleContract,
+    DialogContractsMulti,
+    DialogContractsSingle,
     FeDialog,
+    "el-row": Row,
+    "el-button": Button
   },
   methods: {
     hideAuthDialog (){
@@ -135,8 +119,8 @@ export default {
     }
   },
   mounted() {
-    this.openSingleContract()
-    // this.openMultiContract()
+    // this.openSingleContract()
+    this.openMultiContract()
   }
 
 }

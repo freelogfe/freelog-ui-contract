@@ -1,17 +1,19 @@
+import { Checkbox, Form, FormItem, Button, Message } from 'element-ui'
 export default {
   name: 'license-event',
+  props: ['contractDetail', 'params'],
+  components: {
+    "el-checkbox": Checkbox,
+    "el-form": Form,
+    "el-form-item": FormItem,
+    "el-button": Button
+  },
   data() {
     return {
       accepted: false,
       licenses: []
     }
   },
-  mounted() {
-    this.loadLicenses()
-  },
-
-  props: ['contractDetail', 'params'],
-
   methods: {
     loadLicenses() {
       const promises = this.params.licenseIds.map(rid => this.loadLicenseContent(rid))
@@ -23,31 +25,33 @@ export default {
     loadLicenseContent(resourceId) {
       return this.$axios.get(`/v1/auths/resource/${resourceId}.data`)
         .then((res) => {
-          const error = res.getData().errcode
-          if (error == 15) {
-            this.$message.warning('协议格式不正确，请联系合约作者。')
+          if(typeof res.data.errcode !== 'undefined' && res.data.errcode === 15) {
+            Message.warning('协议格式不正确，请联系合约作者。')
             return
           }
-          return res.getData()
+          return res.data
         })
     },
     signHandler() {
-      this.$services.signingLicenses.post({
+      this.$axios.post('/v1/contracts/events/signingLicenses', {
         contractId: this.contractDetail.contractId,
         eventId: this.params.eventId,
-        licenseIds: this.params.licenseIds,
-        nodeId: this.$route.params.nodeId
+        licenseIds: this.params.licenseIds
       }).then((res) => {
         if (res.data.errcode === 0) {
-          this.$message.success('执行成功')
           this.doneHandler(true)
+          Message.success('执行成功')
         } else {
-          this.$message.error(res.data.msg)
+          Message.error(res.data.msg)
         }
       })
     },
-    doneHandler(shouldUpdate) {
-      this.$emit('close', { shouldUpdate })
+    doneHandler(shouldUpdate, data = {}) {
+      this.$emit('close', { shouldUpdate, data })
     }
+  },
+  mounted() {
+    console.log(this.con)
+    this.loadLicenses()
   }
 }

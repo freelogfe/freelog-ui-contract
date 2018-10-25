@@ -21,8 +21,8 @@
       <div class="sc-cutoff-line-2"></div>
       <div class="sc-right-box">
         <resource-contract :presentable="selectedPresentable"
+                           :DCPolicyIndex.sync="DC_policyIndex"
                            :resourceIdContractsMap="resourceIdContractsMap"
-                           :getContractState="getContractState"
                            @cancel-sign="cancelSgin"
                            @refresh-contract="refreshContract">
         </resource-contract>
@@ -32,10 +32,18 @@
 </template>
 
 <script>
-import resourceContract from './common.vue'
+import resourceContract from './signing-box.vue'
+import {
+  getContractState,
+  resolvePolicyContractState,
+  resolvePresentableDefaultContractState,
+} from './common.js'
 
 export default {
   name: 'multi-contracts',
+  components: {
+    resourceContract,
+  },
   props: {
     presentableList: {
       type: Array,
@@ -44,70 +52,42 @@ export default {
     contractIDs: {
       type: Array,
       required: true
-    }
+    },
   },
   data() {
     return {
-      selectedIndex: 2,
+      DC_policyIndex: 0,
+      selectedIndex: 3,
       isFetchedContracts: false,
       contracts: [],
     }
   },
   methods: {
-    refreshContract() {
-      console.log(JSON.parse(JSON.stringify(this.resourceIdContractsMap)))
-      this.resolvePresentableDefaultContractState()
-      this.resolvePolicyContractState()
+    // 刷新合同状态
+    refreshContract(contract) {
+      console.log('refreshContract --', contract)
+      if(contract) {
+        const { resourceId, segmentId } = contract
+        this.resourceIdContractsMap[resourceId] = this.resourceIdContractsMap[resourceId] || {}
+        this.resourceIdContractsMap[resourceId][segmentId] = contract
+      }
+
+      this.resolvePresentableListDefaultContractState()
+      // resolvePolicyContractState(this.targPolicyList, this.resourceIdContractsMap)
       this.$forceUpdate()
     },
     selectedResource(index) {
       this.selectedIndex = index
-      this.resolvePolicyContractState()
+      resolvePolicyContractState(this.targPolicyList, this.resourceIdContractsMap)
     },
-    // 根据合同获取 资源标签状态
-    getContractState(contract) {
-      if (contract === null) {
-        return { type: 'nosign', tagName: '未签约', info: '未签约' }
-      }
-      switch (contract.status) {
-        case 1:
-        case 2:
-          return { type: 'inactive', tagName: '不可用', info: `合同ID ${contract.contractId}` }
-        case 4:
-          return { type: 'active', tagName: '可用', info: `合同ID ${contract.contractId}` }
-        case 3:
-        case 5:
-        case 6:
-          return { type: 'terminate', tagName: '合同终止', info: '合同终止' }
-        default:
-          return { type: 'nosign', tagName: '未签约', info: '未签约' }
-      }
+    resolvePresentableListDefaultContractState() {
+      this.presentableList.forEach((presentable) => resolvePresentableDefaultContractState(presentable, this.resourceIdContractsMap))
     },
-    // 处理策略与合同的关系
-    resolvePolicyContractState() {
-      this.targPolicyList.forEach((policy) => {
-        var contractMap = this.resourceIdContractsMap[policy.resourceId]
-        var contract = null
-        if(contractMap) {
-          contract = contractMap[policy.segmentId] || null
-        }
-        policy.contractState = this.getContractState(contract)
-      })
-    },
-    resolvePresentableDefaultContractState() {
-      this.presentableList.forEach((presentable) => {
-        const { resourceId, policy } = presentable
-        const segmentId = policy[0].segmentId
-        const contractMap = this.resourceIdContractsMap[resourceId] || {}
 
-        const defaultContract = contractMap[segmentId] || null
-        presentable.contractState = this.getContractState(defaultContract)
+    filterPresentableListPolicy() {
+      this.presentableList.forEach(presentable => {
+        presentable.policy = presentable.policy.filter(p => p.status === 1)
       })
-    },
-    // 重新部分参数
-    reInitialData() {
-      this.defaultContract = this.contracts.length ? this.contracts[0] : null
-      this.resolvePolicyContractState()
     },
     // 点击取消
     cancelSgin() {
@@ -142,8 +122,13 @@ export default {
       return map
     }
   },
-  components: {
-    resourceContract,
+  watch: {
+    selectedIndex() {
+      this.DC_policyIndex = this.selectedPresentable.DC_policyIndex
+    },
+    DC_policyIndex() {
+      resolvePresentableDefaultContractState(this.selectedPresentable, this.resourceIdContractsMap)
+    }
   },
   beforeMount() {
     Promise.all(this.contractIDs.map(contractId =>
@@ -161,8 +146,10 @@ export default {
       .catch(() => Promise.resolve([]))
       .then((contracts) => {
         this.contracts = contracts
-        this.resolvePolicyContractState()
-        this.resolvePresentableDefaultContractState()
+        this.filterPresentableListPolicy()
+        resolvePolicyContractState(this.targPolicyList, this.resourceIdContractsMap)
+        this.resolvePresentableListDefaultContractState()
+        this.DC_policyIndex =  this.selectedPresentable.DC_policyIndex
         this.isFetchedContracts = true
       })
   },

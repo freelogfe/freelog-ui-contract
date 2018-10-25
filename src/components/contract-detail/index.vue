@@ -151,9 +151,7 @@
           })
       },
       cycleEndEvent(code, params, eventId) {},
-
       customEvent(code, params, eventId) {
-
       },
 
     },

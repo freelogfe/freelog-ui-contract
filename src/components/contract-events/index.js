@@ -1,6 +1,6 @@
 import EscrowConfiscate from './escrow/confiscate'
-import LicenseEvent from './license/index'
-import TransactionEvent from './transaction/index'
+import LicenseEvent from './license/license'
+import TransactionEvent from './transaction/transaction'
 
 const eventComponentMap = {
   transaction: {

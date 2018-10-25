@@ -10,20 +10,27 @@
       </div>
       <resource-contract
               :presentable="presentable"
+              :DCPolicyIndex.sync="DC_policyIndex"
               :resourceIdContractsMap="resourceIdContractsMap"
               @cancel-sign="cancelSgin"
-              @refresh-contract="refreshContract"
-              :getContractState='getContractState'>
+              @refresh-contract="refreshContract">
       </resource-contract>
     </div>
   </div>
 </template>
 
 <script>
-import resourceContract from './common.vue'
+import resourceContract from './signing-box.vue'
+import {
+  getContractState,
+  resolvePresentableDefaultContractState,
+} from './common.js'
 
 export default {
   name: 'single-contract',
+  components: {
+    resourceContract,
+  },
   props: {
     presentable: {
       tyep: Object,
@@ -36,6 +43,7 @@ export default {
   },
   data() {
     return {
+      DC_policyIndex: 0,
       resourceName: '',
       defaultContract: null,
       contractState: null, // 资源标签状态
@@ -44,25 +52,6 @@ export default {
     }
   },
   methods: {
-    // 根据合同获取 资源标签状态
-    getContractState(contract) {
-      if (contract === null) {
-        return { type: 'nosign', tagName: '未签约', info: '未签约' }
-      }
-      switch (contract.status) {
-        case 1:
-        case 2:
-          return { type: 'inactive', tagName: '不可用', info: `合同ID ${contract.contractId}` }
-        case 4:
-          return { type: 'active', tagName: '可用', info: `合同ID ${contract.contractId}` }
-        case 3:
-        case 5:
-        case 6:
-          return { type: 'terminate', tagName: '合同终止', info: '合同终止' }
-        default:
-          return { type: 'nosign', tagName: '未签约', info: '未签约' }
-      }
-    },
     // 重新部分参数
     reInitialData() {
       Promise.all(this.contractIDs.map(contractId => this.$axios.get(`/v1/contracts/${contractId}`).then(res => res.data)))
@@ -80,9 +69,14 @@ export default {
         .then((contracts) => {
           this.isFetchedContracts = true
           this.contracts = contracts
-          this.defaultContract = this.contracts.length ? this.contracts[0] : null
-          this.contractState = this.getContractState(this.defaultContract)
+          this.presentable.policy = this.presentable.policy.filter(p => p.status === 1)
+          this.setContractState()
+          this.DC_policyIndex = this.presentable.DC_policyIndex
+
         })
+    },
+    getDefaultContract() {
+
     },
     // 点击取消
     cancelSgin() {
@@ -90,8 +84,19 @@ export default {
     },
     // 默认合同的状态更新
     refreshContract(contract) {
-      this.defaultContract = contract
-      this.contractState = this.getContractState(this.defaultContract)
+      console.log('refreshContract --', contract)
+      if(contract) {
+        const { resourceId, segmentId } = contract
+        this.resourceIdContractsMap[resourceId] = this.resourceIdContractsMap[resourceId] || {}
+        this.resourceIdContractsMap[resourceId][segmentId] = contract
+      }
+
+      this.setContractState()
+      this.$forceUpdate()
+    },
+    setContractState() {
+      resolvePresentableDefaultContractState(this.presentable, this.resourceIdContractsMap)
+      this.contractState = getContractState(this.presentable._defaultContract)
     }
   },
   computed: {
@@ -120,8 +125,10 @@ export default {
       return map
     }
   },
-  components: {
-    resourceContract,
+  watch: {
+    DC_policyIndex() {
+      this.setContractState()
+    }
   },
   beforeMount() {
     this.reInitialData()

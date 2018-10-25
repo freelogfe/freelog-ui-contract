@@ -1,6 +1,6 @@
 <template>
   <transition name="dialogfade" @after-leave="afterLeave">
-    <div v-show="visible" style="position: relative;z-index: 10000;">
+    <div v-show="visible" style="position: relative;">
       <div class="fe-dialog-wrapper" @click.self="handleWrapperClick">
         <div
                 class="fe-dialog"
@@ -167,7 +167,7 @@
     position: fixed;
     left: 0;
     top: 0;
-    z-index: 9999;
+    z-index: 1001;
     width: 100%;
     height: 100%;
     opacity: .5;
@@ -180,7 +180,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 10000;
+    z-index: 1002;
     overflow: auto;
     overscroll-behavior-y: contain;
   }
@@ -189,7 +189,7 @@
     box-sizing: border-box;
     position: relative;
     margin: 0 auto 50px;
-    border-radius: 2px;
+    border-radius: 4px;
     background: #fff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
   }

@@ -1,0 +1,18 @@
+{
+  "ret": 0,
+  "errcode": 0,
+  "msg": "success wwzh",
+  "data": {
+    "recordId": "5bd1d8801fa231002b6830f8",
+    "licenseIds": [
+      "855f00b7221e2bb99aa97ea503b9f2e93682db3a"
+    ],
+    "status": 0,
+    "eventId": "4013c7906ece49499cf2c2e66d43ae53",
+    "operationUserId": 10008,
+    "contractId": "5bd1d71d1fa231002b6830f5",
+    "fsmState": "initial",
+    "createDate": "2018-10-25T14:51:44.527Z",
+    "updateDate": "2018-10-25T14:51:44.527Z"
+  }
+}

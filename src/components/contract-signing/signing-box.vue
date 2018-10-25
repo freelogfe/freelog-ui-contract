@@ -33,29 +33,28 @@
                 @execute="executeContractHandler">
         </contract-detail>
         <pre class="policy-text" v-else>{{actBeautifulPolityText}}</pre>
-        <!--<fe-dialog-->
-                <!--:title="modalTitle"-->
-                <!--ref="eventDialog"-->
-                <!--:visible.sync="showEventExecModal"-->
-                <!--:before-close="closeModalHandler"-->
-                <!--append-to-body-->
-                <!--:center=true-->
-                <!--width="40%"-->
-        <!--&gt;-->
-          <!--<TransactionEvent v-if="showEventExecModal"></TransactionEvent>-->
-          <!--<component-->
-                  <!--:is="eventComponent"-->
-                  <!--:contractDetail="selectedContract"-->
-                  <!--@close="closeModalHandler"-->
-                  <!--:params="selectedContractEvent"-->
-          <!--&gt;</component>-->
-        <!--</fe-dialog>-->
-        <TransactionEvent v-if="showEventExecModal"></TransactionEvent>
+        <fe-dialog
+                :title="modalTitle"
+                title-text-align="center"
+                ref="eventDialog"
+                :visible.sync="showEventExecModal"
+                :before-close="closeModalHandler"
+                append-to-body
+                :center=true
+                width="475px"
+        >
+          <component
+                  :is="eventComponent"
+                  :contractDetail="selectedContract"
+                  @close="closeModalHandler"
+                  :params="selectedContractEvent"
+          ></component>
+        </fe-dialog>
       </div>
       <div class="rcb-tp-status-bar">
         {{actPolicy.contractState && actPolicy.contractState.info}}
         <div class="rcb-tp-sb-btn-box" v-if="actPolicy.contractState.type != 'nosign'">
-          <button class="rcb-tp-sb-default" v-if="selectedContract.isDefault === 1">默认合约</button>
+          <button class="rcb-tp-sb-default" v-if="isSelectedContractDefault"  @click="showSetDefaultContractComfrim">默认合约</button>
           <button class="rcb-tp-sb-set-default" v-else @click="showSetDefaultContractComfrim">设为默认</button>
         </div>
       </div>
@@ -110,22 +109,28 @@
 </template>
 
 <script>
+  import { Message } from 'element-ui'
   import { beautify } from '@freelog/resource-policy-lang'
   import FeDialog from '../fe-dialog/fe-dialog.vue'
   import FeToast from '../freelog-toast/freelog-toast'
   import ContractConfirm from './confirm.vue'
   import ContractDetail from '../contract-detail/index'
 
-  import TransactionEvent from '../contract-events/transaction/index'
+  import {
+    getContractState,
+  } from './common.js'
   import {
     LicenseEvent,
-    // TransactionEvent,
+    TransactionEvent,
     EscrowConfiscate,
     eventComponentMap
   } from '../contract-events/index'
 
   let userinfos = null
   export default {
+    components: {
+      FeDialog, FeToast, ContractConfirm, ContractDetail, TransactionEvent, LicenseEvent, EscrowConfiscate
+    },
     props: {
       presentable: {
         type: Object
@@ -133,28 +138,29 @@
       resourceIdContractsMap: {
         type: Object
       },
-      getContractState: {
-        type: Function,
+      DCPolicyIndex: {
+        type: Number
       }
     },
     data() {
       return {
-        isShowConfirm: false,
+        selectedContract: null,
         confirmType: '',
         resourceIntro: '',
         actPolicyIndex: 0,
+        isShowConfirm: false,
         isActPolicyDefault: false,
         isAddRemark: false,
+        isShowContractContent: false,
+        isOpenContractRecordBox: false,
+        showEventExecModal: false,
+        isShowToast: false,
         selectedContractEvent: '',
         eventComponent: '',
         modalTitle: '',
-        showEventExecModal: false,
         userinfos: {},
-        isShowContractContent: false,
         isUpdateView: 1,
-        isOpenContractRecordBox: false,
-        toastMsg: '',
-        isShowToast: false
+        toastMsg: ''
       }
     },
     methods: {
@@ -167,20 +173,48 @@
           if(contractMap) {
             contract = contractMap[policy.segmentId] || null
           }
-          policy.contractState = this.getContractState(contract)
+          policy.contractState = getContractState(contract)
         })
       },
       exchangePolicy(index) {
         this.actPolicyIndex = index
+        this.exchangeContract()
+      },
+      exchangeContract() {
+        var contract = null
+        const contractMap = this.resourceIdContractsMap[this.actPolicy.resourceId]
+        if(contractMap) {
+          contract = contractMap[this.actPolicy.segmentId]
+          if (contract) {
+            contract.partyOneInfo = {
+              nodeName: this.presentable.nodeName,
+              ownerUserId: this.presentable.userId
+            }
+            contract.partyTwoInfo = userinfos
+          }
+        }
+        // console.log('exchangeContract --',contract)
+
+        this.selectedContract = contract
+      },
+      exchangeDefaultContract() {
+        const contractMap = this.resourceIdContractsMap[this.actPolicy.resourceId]
+        if(contractMap) {
+          for(let segmentId in contractMap) {
+              contractMap[segmentId].isDefault = this.actPolicy.segmentId === segmentId ? 1 : 0
+          }
+        }
       },
       addRemark() {
         this.isAddRemark = true
       },
       // 关闭对话框
-      closeModalHandler() {
+      closeModalHandler({ shouldUpdate }) {
         this.showEventExecModal = false
+        if(shouldUpdate) {
+          this.queryContractState(this.selectedContract.contractId)
+        }
       },
-
       // 合同事件处理 执行合同
       executeContractHandler(params) {
         console.log('params --', params, eventComponentMap[params.type])
@@ -205,9 +239,10 @@
         this.$emit('cancel-sign')
       },
       // 执行合同签约
-      signContract() {
+      signContract(isSetDefault) {
         const {presentableId} = this.presentable
         const {segmentId} = this.actPolicy
+        const isDefault = isSetDefault ? 1 : 0
 
         this.$axios({
           url: '/v1/contracts/createUserPresentableContract',
@@ -216,7 +251,7 @@
             presentableId,
             segmentId,
             targetId: presentableId,
-            isDefault: 1
+            isDefault
           }
         })
           .then(res => res.data)
@@ -224,37 +259,40 @@
             if (res.errcode === 0) {
               const contract = res.data
               this.showToast('签约中...')
-              setTimeout(() => {
-                this.queryContractState(contract.contractId)
-              }, 5e2)
+              this.queryContractState(contract.contractId)
             } else {
-              throw new Error()
+              throw new Error(res.msg)
             }
           })
-          .catch(() => {
-            this.$message({
+          .catch((e) => {
+            Message({
               type: 'error',
               showClose: true,
-              message: '签约失败，稍后再试！！！'
+              message: '签约失败，稍后再试！！！' + e
             })
           })
       },
-      // 签约后：由于签约事件为异步的，须再次查询、确认合同状态
+      // 执行合同后：由于合同事件为异步的，须再次查询、确认合同状态
       queryContractState(contractId) {
-        this.$axios({ url: `/v1/contracts/${contractId}` })
-          .then(res => res.data)
-          .then(res => {
-            const contract = res.data
+        this.timer = setTimeout(() => {
+          this.$axios({ url: `/v1/contracts/${contractId}` })
+            .then(res => res.data)
+            .then(res => {
+              const contract = res.data
+              this.$emit('refresh-contract', contract)
+              this.exchangeContract()
+              if(contract.isDefault === 1) {
+                this.exchangeDefaultContract()
+                this.$emit('update:DCPolicyIndex', this.actPolicyIndex)
+              }
 
-            const obj = this.resourceIdContractsMap[contract.resourceId] || {}
-            obj[contract.segmentId] = contract
-            this.resourceIdContractsMap[contract.resourceId] = obj
-            // 更新policy与contract的映射关系后，强制刷新
-            this.$forceUpdate()
-            this.$emit('refresh-contract')
-            this.resolvePolicyContractStateMap()
-            this.hideToast()
-          })
+              this.hideToast()
+            })
+            .catch(e => {
+              this.hideToast()
+            })
+        }, 5e2)
+
       },
       // 设置默认合同
       setDefualtContract() {
@@ -266,12 +304,19 @@
           .then((res) => {
             if (res.errcode === 0) {
               this.isActPolicyDefault = true
+              this.exchangeDefaultContract()
+              if(this.DC_policyIndex !== this.actPolicyIndex) {
+                this.$emit('update:DCPolicyIndex', this.actPolicyIndex)
+              }else {
+                this.$emit('refresh-contract')
+              }
+              this.$forceUpdate()
             } else {
               throw new Error()
             }
           })
           .catch(() => {
-            this.$message({
+            Message({
               type: 'error',
               showClose: true,
               message: '设置默认合同失败，稍后再试！！！'
@@ -283,13 +328,10 @@
         this.isShowConfirm = true
         this.confirmType = type
       },
-      toggleContractRecordBox() {
-        this.isOpenContractRecordBox = !this.isOpenContractRecordBox
-      },
       confirmCancel() {
         this.isShowConfirm = false
       },
-      confirmSure() {
+      confirmSure({isSetDefault}) {
         this.isShowConfirm = false
         switch (this.confirmType) {
           case 'set-default-contract': {
@@ -297,7 +339,7 @@
             break
           }
           case 'sign-contract': {
-            this.signContract()
+            this.signContract(isSetDefault)
             break
           }
         }
@@ -307,6 +349,9 @@
       },
       showSignConfirm() {
         this.showConfirm('sign-contract')
+      },
+      toggleContractRecordBox() {
+        this.isOpenContractRecordBox = !this.isOpenContractRecordBox
       },
       showToast(msg) {
         this.isShowToast = true
@@ -318,6 +363,9 @@
 
     },
     computed: {
+      isSelectedContractDefault() {
+        return this.selectedContract && this.selectedContract.isDefault === 1
+      },
       isHasContractRecord() {
         return false
       },
@@ -348,22 +396,6 @@
           return item
         })
       },
-      selectedContract() {
-        var contract = null
-        const contractMap = this.resourceIdContractsMap[this.actPolicy.resourceId]
-        if(contractMap) {
-          contract = contractMap[this.actPolicy.segmentId]
-          if (contract) {
-            contract.partyOneInfo = {
-              nodeName: this.presentable.nodeName,
-              ownerUserId: this.presentable.userId
-            }
-            contract.partyTwoInfo = userinfos
-          }
-        }
-
-        return contract
-      },
       actBeautifulPolityText() {
         return beautify(this.actPolicy.policyText)
       },
@@ -371,11 +403,19 @@
         return ''
       }
     },
-    components: {
-      FeDialog, FeToast, ContractConfirm, ContractDetail, TransactionEvent, LicenseEvent, EscrowConfiscate
+    watch: {
+      presentable(newV, oldV) {
+        this.actPolicyIndex = this.DCPolicyIndex
+        this.exchangeContract()
+      },
+    },
+    beforeUpdate() {
+      this.resolvePolicyContractStateMap()
     },
     beforeMount() {
+      this.actPolicyIndex = this.DCPolicyIndex
       this.resolvePolicyContractStateMap()
+      this.exchangeContract()
       if (userinfos === null) {
         this.$axios.get(`/v1/userinfos/current`)
           .then(res => res.data)
@@ -388,11 +428,14 @@
       } else {
         this.isShowContractContent = true
       }
+    },
+    destroyed() {
+      clearTimeout(this.timer)
     }
   }
 </script>
 
 <style lang="less" scoped type="text/less">
-  @import './common.less';
+  @import './signing-box.less';
 </style>
 

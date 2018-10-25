@@ -13,6 +13,7 @@
           ]
         }
       ],
+      "currentFsmState": "initial",
       "policyText": "for public:\n  initial:\n    proceed to auth on accepting agreement @855f00b7221e2bb99aa97ea503b9f2e93682db3a\n  auth:\n    presentable\n    active\n    terminate",
       "policySegmentId": "114add189309c225436bd50bd038ddf0",
       "fsmStates": {
@@ -41,20 +42,20 @@
         }
       }
     },
-    "contractName": "music-player-intro-placeholder",
+    "contractName": "歌曲 - 赵雷 - 理想",
     "remark": "",
-    "isDefault": 0,
+    "isDefault": 1,
     "isConsumptive": 0,
-    "status": 1,
+    "status": 2,
     "segmentId": "114add189309c225436bd50bd038ddf0",
-    "targetId": "5bc468b7fd691b002cf3dd2a",
+    "targetId": "5bc441aefd691b002cf3dd26",
     "partyOne": "10017",
     "partyTwo": "10008",
     "partyOneUserId": 10008,
     "partyTwoUserId": 10008,
     "resourceId": "47fe46a5481dd2a6dd37ac28fcb90d5c459d1e99",
     "contractType": 3,
-    "createDate": "2018-10-25T15:18:35.025Z",
-    "updateDate": "2018-10-25T15:18:35.025Z"
+    "createDate": "2018-10-25T15:29:56.881Z",
+    "updateDate": "2018-10-25T15:30:13.820Z"
   }
 }
