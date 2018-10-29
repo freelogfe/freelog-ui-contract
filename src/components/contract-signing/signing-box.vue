@@ -28,7 +28,7 @@
     <div class="rcb-tab-pane">
       <div class="rcb-tp-contract-content">
         <contract-detail
-                v-if="actPolicy.contractState.type === 'inactive' && isShowContractContent"
+                v-if="actPolicy.contractState.type === 'inactive'"
                 :contract="selectedContract"
                 @execute="executeContractHandler">
         </contract-detail>
@@ -126,7 +126,6 @@
     eventComponentMap
   } from '../contract-events/index'
 
-  let userinfos = null
   export default {
     components: {
       FeDialog, FeToast, ContractConfirm, ContractDetail, TransactionEvent, LicenseEvent, EscrowConfiscate
@@ -140,7 +139,7 @@
       },
       DCPolicyIndex: {
         type: Number
-      }
+      },
     },
     data() {
       return {
@@ -151,14 +150,12 @@
         isShowConfirm: false,
         isActPolicyDefault: false,
         isAddRemark: false,
-        isShowContractContent: false,
         isOpenContractRecordBox: false,
         showEventExecModal: false,
         isShowToast: false,
         selectedContractEvent: '',
         eventComponent: '',
         modalTitle: '',
-        userinfos: {},
         isUpdateView: 1,
         toastMsg: ''
       }
@@ -178,6 +175,7 @@
       },
       exchangePolicy(index) {
         this.actPolicyIndex = index
+        console.log('run exchangePolicy --', index)
         this.exchangeContract()
       },
       exchangeContract() {
@@ -190,10 +188,9 @@
               nodeName: this.presentable.nodeName,
               ownerUserId: this.presentable.userId
             }
-            contract.partyTwoInfo = userinfos
           }
         }
-        // console.log('exchangeContract --',contract)
+        console.log('run exchangeContract --',contract)
 
         this.selectedContract = contract
       },
@@ -236,7 +233,7 @@
       },
       // 取消签约并关闭对话框
       cancelSign() {
-        this.$emit('cancel-sign')
+        this.$emit('cancel')
       },
       // 执行合同签约
       signContract(isSetDefault) {
@@ -376,6 +373,7 @@
         ]
       },
       actPolicy() {
+        console.log('computed - actPolicy --')
         const policy = this.policyList[this.actPolicyIndex]
         return policy
       },
@@ -416,18 +414,6 @@
       this.actPolicyIndex = this.DCPolicyIndex
       this.resolvePolicyContractStateMap()
       this.exchangeContract()
-      if (userinfos === null) {
-        this.$axios.get(`/v1/userinfos/current`)
-          .then(res => res.data)
-          .then((res) => {
-            if (res.errcode === 0) {
-              userinfos = res.data
-              this.isShowContractContent = true
-            }
-          })
-      } else {
-        this.isShowContractContent = true
-      }
     },
     destroyed() {
       clearTimeout(this.timer)

@@ -1,14 +1,21 @@
 {
-  "name": "freelog-ui-contract",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@freelog/freelog-ui-contract",
+  "version": "0.0.1",
+  "description": "freelog components",
   "scripts": {
+    "publish": "npm publish --access=public",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
-  "main": "",
-  "dependencies": {
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:freelogfe/freelog-ui-contract.git"
+  },
+  "author": "Wwzh",
+  "license": "MIT",
+  "peerDependencies": {
     "@freelog/resource-policy-lang": "0.0.33",
     "element-ui": "^2.4.8"
   },

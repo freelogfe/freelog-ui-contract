@@ -12,7 +12,7 @@
               :presentable="presentable"
               :DCPolicyIndex.sync="DC_policyIndex"
               :resourceIdContractsMap="resourceIdContractsMap"
-              @cancel-sign="cancelSgin"
+              @cancel="cancelSign"
               @refresh-contract="refreshContract">
       </resource-contract>
     </div>
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+  import { Message } from 'element-ui'
 import resourceContract from './signing-box.vue'
 import {
   getContractState,
@@ -33,11 +34,7 @@ export default {
   },
   props: {
     presentable: {
-      tyep: Object,
-      required: true
-    },
-    contractIDs: {
-      type: Array,
+      type: Object,
       required: true
     }
   },
@@ -52,35 +49,32 @@ export default {
     }
   },
   methods: {
-    // 重新部分参数
     reInitialData() {
-      Promise.all(this.contractIDs.map(contractId => this.$axios.get(`/v1/contracts/${contractId}`).then(res => res.data)))
-        .then((arr) => {
-          const contracts = []
-          arr.forEach((contractRes) => {
-            if (contractRes.errcode === 0) {
-              contracts.push(contractRes.data)
-            }
-          })
-
-          return Promise.resolve(contracts)
+      this.getContracts()
+    },
+    // 获取该资源的所有合同
+    getContracts() {
+      const { resourceId, userId } = this.presentable
+      return this.$axios.get(`/v1/contracts/contractRecords?resourceIds=${resourceId}&partyTwo=${userId}&isDefault=1`)
+        .then(res => {
+          if(res.data.errcode === 0) {
+            return res.data.data
+          }else {
+            return Promise.reject(rea.data.msg)
+          }
         })
-        .catch(() => Promise.resolve([]))
-        .then((contracts) => {
+        .then(contracts => {
           this.isFetchedContracts = true
           this.contracts = contracts
           this.presentable.policy = this.presentable.policy.filter(p => p.status === 1)
           this.setContractState()
           this.DC_policyIndex = this.presentable.DC_policyIndex
-
         })
-    },
-    getDefaultContract() {
-
+        .catch((e) => Message.error(e))
     },
     // 点击取消
-    cancelSgin() {
-      this.$emit('close-dialog')
+    cancelSign() {
+      this.$emit('cancel-sign')
     },
     // 默认合同的状态更新
     refreshContract(contract) {
@@ -121,7 +115,6 @@ export default {
         obj[contract.segmentId] = contract
         map[contract.resourceId] = obj
       })
-      console.log('map', map)
       return map
     }
   },
