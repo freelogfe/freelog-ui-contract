@@ -6,7 +6,6 @@
           top="5vh"
           :visible.sync="isShowDialog"
           @close="handleClose"
-          is-destoryed-body
   >
 
     <single-contract
@@ -67,12 +66,9 @@
       }
     },
     watch: {
-      isShowDialog(newV) {
-        this.$emit('update:visible', newV)
+      visible(newV) {
+        this.isShowDialog = newV
       }
-    },
-    beforeUpdate() {
-      this.init()
     },
     beforeMount() {
       this.init()

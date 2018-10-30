@@ -64,7 +64,7 @@ export default {
 
       const resourceIds = this.presentableList.map(p => p.resourceId)
       const userId = this.presentableList[0].userId
-      return this.$axios.get(`/v1/contracts/contractRecords?resourceIds=${resourceIds}&partyTwo=${userId}&isDefault=1`)
+      return this.$axios.get(`/v1/contracts/contractRecords?resourceIds=${resourceIds}&partyTwo=${userId}`)
         .then(res => {
           if(res.data.errcode === 0) {
             return res.data.data

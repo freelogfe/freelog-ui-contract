@@ -23,7 +23,7 @@
         >{{item.policyName + (item.contractState.type !== 'nosign' ? '(已签约)': '')}}
         </li>
       </ul>
-      <div class="rcb-contract-record" :class="{'disabled': !isHasContractRecord}" @click="toggleContractRecordBox"></div>
+      <div class="rcb-contract-record" :class="{'disabled': !isHasContractRecord, 'opened': isOpenContractRecordBox}" @click="toggleContractRecordBox"></div>
     </div>
     <div class="rcb-tab-pane">
       <div class="rcb-tp-contract-content">
@@ -70,27 +70,27 @@
           <tbody>
             <tr v-for="(item, index) in contractRecords" :key="'record-'+index">
               <td>{{item.contractId}}</td>
-              <td>{{item.policyName}}</td>
-              <td>{{item.signDate}}</td>
+              <td>{{item.contractName}}</td>
+              <td>{{new Date(item.updateDate).toLocaleString()}}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-    <div class="rcb-remark">
+    <div class="rcb-remark" v-if="actPolicy.contractState.type !== 'nosign'">
       <div class="rcb-r-left">
-        <span v-if="actPolicy.contractState.type === 'nosign'" class="rcb-add-remark" id="rcb-remak" @click="addRemark">添加备注 <i
+        <span v-if="targRemark === ''" class="rcb-add-remark" id="rcb-remak" @click="addRemark">添加备注 <i
                 class="el-icon-plus"></i> </span>
-        <span v-else>备注 <i class="el-icon-edit-outline"></i></span>
+        <span v-else  @click="addRemark">备注 <i class="el-icon-edit-outline"></i></span>
       </div>
       <div class="rcb-r-right">
-        <div v-if="actPolicy.contractState.type != 'nosign'">{{targRemark}}</div>
-        <textarea v-if="actPolicy.contractState.type === 'nosign' && isAddRemark" name="rcb-remak" id=""
-                  rows="3"></textarea>
+        <textarea v-if="isAddRemark" name="rcb-remak" id="" v-model="targRemark"
+                  rows="3" @blur="updateRemark"></textarea>
+        <div v-else>{{targRemark}}</div>
       </div>
     </div>
     <div class="rcb-footer">
-      <button class="btn-normal btn-cancel" @click="cancelSign">取消</button>
+      <!--<button class="btn-normal btn-cancel" @click="cancelSign">取消</button>-->
       <button type="button" class="btn-normal btn-sign" :class="{'disabled': this.actPolicy && this.actPolicy.contractState.type !== 'nosign'}" @click="showSignConfirm">
         签约
       </button>
@@ -109,7 +109,7 @@
 </template>
 
 <script>
-  import { Message } from 'element-ui'
+  import { Message, Loading } from 'element-ui'
   import { beautify } from '@freelog/resource-policy-lang'
   import FeDialog from '../fe-dialog/fe-dialog.vue'
   import FeToast from '../freelog-toast/freelog-toast'
@@ -128,7 +128,7 @@
 
   export default {
     components: {
-      FeDialog, FeToast, ContractConfirm, ContractDetail, TransactionEvent, LicenseEvent, EscrowConfiscate
+      FeDialog, FeToast, ContractConfirm, ContractDetail, TransactionEvent, LicenseEvent, EscrowConfiscate,
     },
     props: {
       presentable: {
@@ -157,7 +157,10 @@
         eventComponent: '',
         modalTitle: '',
         isUpdateView: 1,
-        toastMsg: ''
+        toastMsg: '',
+        recordBoxLoading: null,
+        contractRecords: [],
+        targRemark: ''
       }
     },
     methods: {
@@ -193,6 +196,7 @@
         console.log('run exchangeContract --',contract)
 
         this.selectedContract = contract
+        this.targRemark = this.selectedContract.remark
       },
       exchangeDefaultContract() {
         const contractMap = this.resourceIdContractsMap[this.actPolicy.resourceId]
@@ -357,28 +361,50 @@
       hideToast() {
         this.isShowToast = false
       },
-
+      getContractRecords() {
+        this.$axios.get(`/v1/contracts/terminateContracts?partyTwo=${this.userId}&targetId=${this.presentableId}`)
+          .then(res => res.data)
+          .then(res => {
+            if(res.errcode === 0) {
+              this.contractRecords = res.data
+            }else {
+              this.contractRecords = []
+            }
+          })
+      },
+      updateRemark(event) {
+        var remark = event.target.value
+        this.$axios.put(`/v1/contracts/${this.selectedContract.contractId}`,{
+          remark
+        })
+          .then(res => res.data)
+          .then(res => {
+            if(res.errcode === 0) {
+              this.targRemark = remark
+              this.isAddRemark = false
+            }
+          })
+      }
     },
     computed: {
       isSelectedContractDefault() {
         return this.selectedContract && this.selectedContract.isDefault === 1
       },
       isHasContractRecord() {
-        return false
-      },
-      contractRecords() {
-        return [
-          { contractId: '2345ythdnhfgkto87jhddfbg', policyName: '授权策略1', signDate: '2018-09-10 12:00' },
-          { contractId: '2345yfsfsfsffso87jhddfbg', policyName: '授权策略2', signDate: '2018-09-10 12:00' },
-        ]
+        return this.contractRecords.length !== 0
       },
       actPolicy() {
-        console.log('computed - actPolicy --')
         const policy = this.policyList[this.actPolicyIndex]
         return policy
       },
       resourceId() {
         return this.presentable.resourceId
+      },
+      presentableId() {
+        return this.presentable.presentableId
+      },
+      userId() {
+        return this.presentable.userId
       },
       resourceType() {
         return this.presentable.resourceInfo.resourceType
@@ -397,14 +423,12 @@
       actBeautifulPolityText() {
         return beautify(this.actPolicy.policyText)
       },
-      targRemark() {
-        return ''
-      }
     },
     watch: {
       presentable(newV, oldV) {
         this.actPolicyIndex = this.DCPolicyIndex
         this.exchangeContract()
+        this.getContractRecords()
       },
     },
     beforeUpdate() {
@@ -414,6 +438,7 @@
       this.actPolicyIndex = this.DCPolicyIndex
       this.resolvePolicyContractStateMap()
       this.exchangeContract()
+      this.getContractRecords()
     },
     destroyed() {
       clearTimeout(this.timer)

@@ -60,12 +60,18 @@
     right: 5px;
     width: 20px;
     height: 20px;
+    padding-bottom: 6px;
 
     background-image: url('../../assets/img/normal-record.png');
+    background-repeat: no-repeat;
     cursor: pointer;
 
     &:hover{
       background-image: url('../../assets/img/hover:click-record.png');
+    }
+
+    &.opened{
+      border-bottom: 3px solid #4396F0;
     }
   }
 
@@ -181,6 +187,8 @@
   .rcb-add-remark {
     color: #3C99FC;
     cursor: pointer;
+
+    i{ font-weight: bold; }
   }
   .rcb-r-left {
     width: 78px;
@@ -195,6 +203,7 @@
       border-radius: 4px;
       outline: none;
       resize: none;
+      border-color: #cecece;
     }
   }
 }
