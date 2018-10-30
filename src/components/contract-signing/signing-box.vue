@@ -13,7 +13,7 @@
       <div class="rcb-value">{{resourceIntro}}</div>
     </div>
     <div class="rcb-tab-box">
-      <ul>
+      <ul :class="{'disabled': isOpenContractRecordBox}">
         <li
                 class="rcb-tab-item"
                 :class="{'active': index === actPolicyIndex}"
