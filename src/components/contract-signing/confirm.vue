@@ -1,14 +1,12 @@
 <template>
-  <div>
-    <fe-dialog
-            title-text-align="center"
-            :close-on-click-modal="false"
+    <el-dialog
+            center
             title="提示"
             width="440px"
             top="25vh"
-            :visible.sync="visible"
-            is-destoryed-body
+            :visible.sync="isShowDialog"
             @close="confirmCancel"
+            append-to-body
     >
       <div class="rcb-confirm-cont">
         <div class="confirm-set-default-contract" v-if="confirmType === 'set-default-contract'">
@@ -28,18 +26,16 @@
           <button class="cbb-btn cbb-sure" @click="confirmSure">确认</button>
         </div>
       </div>
-    </fe-dialog>
-  </div>
+    </el-dialog>
 </template>
 
 <script>
-  import FeDialog from '../fe-dialog/fe-dialog'
-  import { Checkbox } from 'element-ui'
+  import { Checkbox, Dialog } from 'element-ui'
   export default {
     name: 'contract-confirm',
     components: {
-      FeDialog,
-      "el-checkbox": Checkbox
+      "el-checkbox": Checkbox,
+      "el-dialog": Dialog
     },
     props: {
       visible: {
@@ -57,6 +53,7 @@
     },
     data() {
       return {
+        isShowDialog: false,
         isSetDefault: false
       }
     },
@@ -65,11 +62,20 @@
         this.isSetDefault = !this.isSetDefault
       },
       confirmCancel() {
-        this.$emit('cancel')
+        this.$emit('update:visible', false)
       },
       confirmSure() {
         this.$emit('sure',{ isSetDefault: this.isSetDefault })
+        this.$emit('update:visible', false)
       },
+    },
+    watch: {
+      visible() {
+        this.isShowDialog = this.visible
+      }
+    },
+    beforeMount() {
+      this.isShowDialog = this.visible
     }
 
   }

@@ -1,34 +1,30 @@
 <template>
-  <fe-dialog
+  <el-dialog
           :close-on-click-modal="false"
-          :title="title"
           :width="dWidth"
           top="5vh"
           :visible.sync="isShowDialog"
           @close="handleClose"
   >
-
-    <single-contract
-            v-if="presentableList.length && presentableList.length === 1"
-            :presentable="presentableList[0]"
-            @cancel-sign="cancelSign"
-    ></single-contract>
+    <div slot="title" class="contract-dialog-title">
+      资源签约<span>{{hostname}}</span>
+    </div>
     <multi-contracts
-            v-if="presentableList.length && presentableList.length > 1"
+            v-if="presentableList.length"
             :presentableList="presentableList"
             @cancel-sign="cancelSign"
     ></multi-contracts>
-  </fe-dialog>
+  </el-dialog>
 </template>
 
 <script>
-  import FeDialog from '../fe-dialog/fe-dialog.vue'
-  import SingleContract from './contract-single'
+
+  import { Dialog } from 'element-ui'
   import MultiContracts from './contracts-multi.vue'
 
   export default {
     name: 'contract-signing-dialog',
-    components: { FeDialog, SingleContract, MultiContracts },
+    components: { 'el-dialog': Dialog, MultiContracts },
     props: {
       visible: {
         type: Boolean
@@ -58,8 +54,8 @@
       },
     },
     computed: {
-      title(){
-        return `资源签约&nbsp;&nbsp;&nbsp;&nbsp;${window.location.hostname}`
+      hostname(){
+        return window.location.hostname
       },
       dWidth() {
         return this.presentableList.length > 1 ? '1000px' : '790px'
@@ -75,3 +71,16 @@
     }
   }
 </script>
+
+<style lang="less" type="text/less" scoped>
+  .contract-dialog-title {
+    color: #222;
+    font-size: 16px;
+    font-weight: bold;
+
+    span {
+      margin-left: 16px;
+    }
+  }
+
+</style>

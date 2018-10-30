@@ -63,8 +63,6 @@ export default TransactionEvent
     margin: auto;
 
     .el-form-item {
-      margin-bottom: 0;
-      font-weight: bold;
 
       &.t-password{
         margin-top: 10px;

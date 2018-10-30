@@ -1,11 +1,39 @@
 <template>
-  <div class="contract-detail-content-wrapper" v-html="contractDetail" @click="handlerProxy">
+  <div class="contract-detail-content-wrapper" >
+    <div
+            v-if="contract.status === 2"
+            v-html="contractDetail"
+            @click="handlerProxy"
+    ></div>
+    <pre class="policy-text" v-else>{{beautifulPolityText}}</pre>
 
+    <el-dialog
+            :title="modalTitle"
+            ref="eventDialog"
+            :visible.sync="showEventExecDialog"
+            :before-close="closeDialogHandler"
+            append-to-body
+            :center=true
+            width="475px"
+    >
+      <component
+              :is="eventComponent"
+              :contractDetail="contract"
+              @close="closeDialogHandler"
+              :params="targetContractEvent"
+      ></component>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-  import { highlight } from '@freelog/resource-policy-lang'
+  import { highlight, beautify } from '@freelog/resource-policy-lang'
+  import {
+    LicenseEvent,
+    TransactionEvent,
+    EscrowConfiscate,
+    eventComponentMap
+  } from '../contract-events/index'
 
   export default {
     name: 'contract-detail',
@@ -15,9 +43,15 @@
         required: true
       }
     },
+    components: {
+      TransactionEvent, LicenseEvent, EscrowConfiscate,
+    },
     data() {
       return {
-
+        modalTitle: '',
+        eventComponent: '',
+        showEventExecDialog: false,
+        targetContractEvent: {}
       }
     },
     computed: {
@@ -32,6 +66,9 @@
       },
       policyText() {
         return this.contract.contractClause.policyText
+      },
+      beautifulPolityText() {
+        return beautify(this.policyText)
       },
       contractDetail() {
         return highlight(this.policyText)
@@ -65,6 +102,25 @@
           }
         }
       },
+      // 合同事件处理 执行合同
+      executeContractHandler(params) {
+        console.log('params --', params, eventComponentMap[params.type])
+        switch (params.type) {
+          case 'escrowConfiscated':
+          case 'signingEvent':
+          case 'transactionEvent': {
+            const eventComConfig = eventComponentMap[params.type]
+            this.targetContractEvent = params
+            this.eventComponent = eventComConfig.type
+            this.modalTitle = eventComConfig.title
+            this.showEventExecDialog = true
+            break
+          }
+          default: {
+            // this.updateContractDetail()
+          }
+        }
+      },
       getStateTransitionData(transition) {
         if (this.fsmStates[this.currentFsmState]) {
           const transitionMap = this.fsmStates[this.currentFsmState].transition
@@ -74,26 +130,25 @@
       },
       // 签约协议
       signingEvent(code, params, eventId) {
-        console.log('run escrowExceedAmount - code, params, eventId --', code, params, eventId)
         const options = Object.assign({}, params, {
-          type: 'signing',
+          type: 'signingEvent',
           eventId,
           licenseIds: params.licenseResourceId,
           contractId: this.contractId
         })
-        this.$emit('execute', options)
+        this.executeContractHandler(options)
       },
       cycleEndEvent(code, params, eventId) {},
       // 交易事件
       transactionEvent(code, params, eventId) {
         const options = Object.assign({}, params, {
-          type: 'transaction',
+          type: 'transactionEvent',
           payType: 'transaction',
           eventId,
           amount: params.amount.literal,
           contractId: this.contractId
         })
-        this.$emit('execute', options)
+        this.executeContractHandler(options)
       },
       settlementEvent(code, params, eventId) {},
       viewCountEvent(code, params, eventId) {},
@@ -101,16 +156,15 @@
       presentCountEvent(code, params, eventId) {},
       // 收取保证金 - 弹窗 - 支付
       escrowExceedAmount(code, params, eventId) {
-        console.log('run escrowExceedAmount - code, params, eventId --', code, params, eventId)
 
         const options = Object.assign({}, params, {
-          type: 'transaction',
+          type: 'transactionEvent',
           payType: 'escrowExceedAmount',
           eventId,
           amount: params.amount.literal,
           contractId: this.contractId
         })
-        this.$emit('execute', options)
+        this.executeContractHandler(options)
       },
       // 保证金没收
       escrowConfiscated(code, params, eventId) {
@@ -119,7 +173,7 @@
           eventId,
           contractId: this.contractId
         })
-        this.$emit('execute', options)
+        this.executeContractHandler(options)
       },
       // 保证金赎回
       escrowRefunded(code, params, eventId) {
@@ -153,7 +207,12 @@
       cycleEndEvent(code, params, eventId) {},
       customEvent(code, params, eventId) {
       },
-
+      closeDialogHandler({ shouldUpdate }) {
+        this.showEventExecDialog = false
+        if(shouldUpdate) {
+          this.$emit('update-contract', { shouldUpdate })
+        }
+      }
     },
     mounted() {
       this.highlightCurrentState()

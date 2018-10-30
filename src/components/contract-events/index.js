@@ -3,11 +3,11 @@ import LicenseEvent from './license/license'
 import TransactionEvent from './transaction/transaction'
 
 const eventComponentMap = {
-  transaction: {
+  transactionEvent: {
     type: TransactionEvent.name,
     title: '支付'
   },
-  signing: {
+  signingEvent: {
     type: LicenseEvent.name,
     title: '协议签署'
   },
