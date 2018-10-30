@@ -27,6 +27,7 @@
 </template>
 
 <script>
+  import { Dialog } from 'element-ui'
   import { highlight, beautify } from '@freelog/resource-policy-lang'
   import {
     LicenseEvent,
@@ -44,6 +45,7 @@
       }
     },
     components: {
+      "el-dialog": Dialog,
       TransactionEvent, LicenseEvent, EscrowConfiscate,
     },
     data() {

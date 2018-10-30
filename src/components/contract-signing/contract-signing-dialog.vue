@@ -1,7 +1,7 @@
 <template>
   <el-dialog
           :close-on-click-modal="false"
-          :width="dWidth"
+          width="1000px"
           top="5vh"
           :visible.sync="isShowDialog"
           @close="handleClose"
@@ -9,22 +9,22 @@
     <div slot="title" class="contract-dialog-title">
       资源签约<span>{{hostname}}</span>
     </div>
-    <multi-contracts
+    <contract-signing-multi
             v-if="presentableList.length"
             :presentableList="presentableList"
             @cancel-sign="cancelSign"
-    ></multi-contracts>
+    ></contract-signing-multi>
   </el-dialog>
 </template>
 
 <script>
 
   import { Dialog } from 'element-ui'
-  import MultiContracts from './contracts-multi.vue'
+  import ContractSigningMulti from './signing-multi.vue'
 
   export default {
     name: 'contract-signing-dialog',
-    components: { 'el-dialog': Dialog, MultiContracts },
+    components: { 'el-dialog': Dialog, ContractSigningMulti },
     props: {
       visible: {
         type: Boolean
@@ -57,9 +57,6 @@
       hostname(){
         return window.location.hostname
       },
-      dWidth() {
-        return this.presentableList.length > 1 ? '1000px' : '790px'
-      }
     },
     watch: {
       visible(newV) {
@@ -77,6 +74,7 @@
     color: #222;
     font-size: 16px;
     font-weight: bold;
+    text-align: left;
 
     span {
       margin-left: 16px;

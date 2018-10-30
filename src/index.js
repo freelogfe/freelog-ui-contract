@@ -1,11 +1,10 @@
-import ContractDetail from './components/contract-detail/index'
-import MultiContracts from './components/contract-signing/contracts-multi'
-import SingleContract from './components/contract-signing/contract-single'
+
+import ContractSigningSingle from './components/contract-signing/signing-single'
 import ContractSigningDialog from './components/contract-signing/contract-signing-dialog'
+import ContractDetail from './components/contract-detail/index'
 
 export {
+  ContractSigningSingle,
   ContractDetail,
-  MultiContracts,
-  SingleContract,
   ContractSigningDialog
 }
