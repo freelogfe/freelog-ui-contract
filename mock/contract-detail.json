@@ -3,7 +3,7 @@
   "errcode": 0,
   "msg": "success wwzh",
   "data": {
-    "contractId": "5bd1e1741fa231002b6830fd",
+    "contractId": "5bd95af8ca67e0002afb881a",
     "contractClause": {
       "authorizedObjects": [
         {
@@ -14,20 +14,35 @@
         }
       ],
       "currentFsmState": "initial",
-      "policyText": "for public:\n  initial:\n    proceed to auth on accepting agreement @855f00b7221e2bb99aa97ea503b9f2e93682db3a\n  auth:\n    presentable\n    active\n    terminate",
-      "policySegmentId": "114add189309c225436bd50bd038ddf0",
+      "policyText": "for public:\n  escrow account acct\n  custom event acceptor.customEvent\n\n  initial:\n    proceed to auth on acct exceed 10 feather\n  auth:\n    presentable\n    active\n    proceed to refund on acct.confiscated\n  refund:\n    proceed to finish on acct.refunded\n  finish:\n    terminate",
+      "policySegmentId": "0c6c51d9f4a6b6a73c3ce92edef5b67b",
+      "fsmDeclarations": {
+        "acct": {
+          "type": "escrowaccount",
+          "declareType": "contractAccount",
+          "currencyType": 1,
+          "accountId": "feth212327bb7ba"
+        },
+        "customEvent": {
+          "type": "acceptor",
+          "declareType": "customEvent"
+        }
+      },
       "fsmStates": {
         "initial": {
           "authorization": [],
           "transition": {
             "auth": {
-              "code": "S101",
+              "code": "S210",
               "params": {
-                "licenseResourceId": [
-                  "855f00b7221e2bb99aa97ea503b9f2e93682db3a"
-                ]
+                "contractAccountName": "acct",
+                "amount": {
+                  "type": "literal",
+                  "literal": "10"
+                },
+                "currencyUnit": "feather"
               },
-              "eventId": "b6c2a0609367426ca2cf4963d7734f23"
+              "eventId": "b0781013b6724a14bee8cc84d22c7be6"
             }
           }
         },
@@ -37,25 +52,49 @@
             "active"
           ],
           "transition": {
+            "refund": {
+              "code": "S211",
+              "params": {
+                "contractAccountName": "acct"
+              },
+              "eventId": "58f46acf98f74c5783e71a98978da82f"
+            }
+          }
+        },
+        "refund": {
+          "authorization": [],
+          "transition": {
+            "finish": {
+              "code": "S212",
+              "params": {
+                "contractAccountName": "acct"
+              },
+              "eventId": "42a4d7efae9943578a7f6477ce62c062"
+            }
+          }
+        },
+        "finish": {
+          "authorization": [],
+          "transition": {
             "terminate": null
           }
         }
       }
     },
-    "contractName": "歌曲 - 赵雷 - 理想",
+    "contractName": "歌曲 - 陈奕迅 - 淘汰",
     "remark": "",
     "isDefault": 1,
     "isConsumptive": 0,
     "status": 2,
-    "segmentId": "114add189309c225436bd50bd038ddf0",
-    "targetId": "5bc441aefd691b002cf3dd26",
-    "partyOne": "10017",
-    "partyTwo": "10008",
+    "targetId": "5bd1ebc0e5964c002c9a8cc5",
+    "segmentId": "0c6c51d9f4a6b6a73c3ce92edef5b67b",
     "partyOneUserId": 10008,
     "partyTwoUserId": 10008,
-    "resourceId": "47fe46a5481dd2a6dd37ac28fcb90d5c459d1e99",
-    "contractType": 3,
-    "createDate": "2018-10-25T15:29:56.881Z",
-    "updateDate": "2018-10-25T15:30:13.820Z"
+    "partyOne": "5bd1ebc0e5964c002c9a8cc5",
+    "partyTwo": "10017",
+    "resourceId": "697fa74d29a36190b6059e7284361b771a9c134a",
+    "contractType": 2,
+    "createDate": "2018-10-31T07:34:16.676Z",
+    "updateDate": "2018-10-31T07:34:16.693Z"
   }
 }

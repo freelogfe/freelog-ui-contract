@@ -1,12 +1,7 @@
 <template>
   <div class="transaction-wrap">
-    <el-alert
-      v-if="tipMsg"
-      :title="tipMsg"
-      type="warning">
-    </el-alert>
 
-    <el-form label-position="left" class="small-el-form" label-width="80px" :model="contractDetail">
+    <el-form label-position="left" class="small-el-form" label-width="120px" :model="contractDetail">
       <el-form-item label="合同ID">
         {{contractDetail.contractId}}
       </el-form-item>
@@ -16,16 +11,23 @@
       <el-form-item label="乙方">
         {{contractDetail.partyTwo}}
       </el-form-item>
-      <el-form-item label="转入账号">
+      <el-form-item label="转入账号" v-if="false">
         {{params.contractAccountName}}
       </el-form-item>
-      <el-form-item label="转账金额">
-        {{params.amount}} {{unitType}}
+      <el-form-item label="转账金额" v-if="amount !== 0">
+        {{amount}} {{unitType}}
       </el-form-item>
-      <el-form-item label="转出账号">
-        <el-select :loading="isLoadingAccount" loading-text="正在获取账户中..." v-model="fromAccountId" size="small" placeholder="请选择" @visible-change="selectVisibleChange">
+      <el-form-item :label="accountLabel">
+        <el-select
+                :loading="isLoadingAccount"
+                loading-text="正在获取账户中..."
+                size="small"
+                placeholder="请选择"
+                v-model="accountId"
+                @visible-change="selectVisibleChange"
+        >
           <el-option
-            v-for="item in options"
+            v-for="item in accountOptions"
             :key="item.accountId"
             :label="item.accountId"
             :value="item.accountId">
@@ -38,13 +40,13 @@
           <i class="el-icon-question"></i>
         </el-tooltip>
       </el-form-item>
-      <el-form-item label="支付密码" class="t-password">
+      <el-form-item label="支付密码" class="t-password" v-if="isNeedPassword">
         <el-input type="password" size="small" style="max-width: 300px;" v-model="password"
                   placeholder="请输入支付密码"></el-input>
       </el-form-item>
       <el-form-item class="button-group">
         <el-button @click="doneHandler">取 消</el-button>
-        <el-button type="primary" @click="pay" :disabled="order.status ==1||order.status ==2">确 定</el-button>
+        <el-button type="primary" @click="sure" :disabled="!isCanSubmit">确 定</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -72,5 +74,7 @@ export default TransactionEvent
     .button-group {
       margin-top: 20px;
     }
+
+    .el-tooltip{ margin-left: 10px; }
   }
 </style>

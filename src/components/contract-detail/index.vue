@@ -1,33 +1,33 @@
 <template>
   <div class="contract-detail-content-wrapper" >
-    <div
-            v-if="contract.status === 2"
-            v-html="contractDetail"
-            @click="handlerProxy"
-    ></div>
+    <div v-if="contract.status === 2">
+      <div
+              v-html="contractDetail"
+              @click="handlerProxy"
+      ></div>
+      <el-dialog
+              :title="dialogTitle"
+              ref="eventDialog"
+              :visible.sync="showEventExecDialog"
+              :before-close="closeDialogHandler"
+              append-to-body
+              :center=true
+              width="475px"
+      >
+        <component
+                :is="eventComponent"
+                :contractDetail="contract"
+                @close="closeDialogHandler"
+                :params="targetContractEvent"
+        ></component>
+      </el-dialog>
+    </div>
     <pre class="policy-text" v-else>{{beautifulPolityText}}</pre>
-
-    <el-dialog
-            :title="modalTitle"
-            ref="eventDialog"
-            :visible.sync="showEventExecDialog"
-            :before-close="closeDialogHandler"
-            append-to-body
-            :center=true
-            width="475px"
-    >
-      <component
-              :is="eventComponent"
-              :contractDetail="contract"
-              @close="closeDialogHandler"
-              :params="targetContractEvent"
-      ></component>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-  import { Dialog } from 'element-ui'
+  import { Dialog, MessageBox, Message } from 'element-ui'
   import { highlight, beautify } from '@freelog/resource-policy-lang'
   import {
     LicenseEvent,
@@ -50,15 +50,18 @@
     },
     data() {
       return {
-        modalTitle: '',
+        dialogTitle: '',
         eventComponent: '',
         showEventExecDialog: false,
-        targetContractEvent: {}
+        targetContractEvent: {},
       }
     },
     computed: {
       contractId() {
         return this.contract.contractId
+      },
+      partyTwoUserId() {
+        return this.contract.partyTwoUserId
       },
       fsmStates() {
         return this.contract.contractClause.fsmStates
@@ -74,7 +77,7 @@
       },
       contractDetail() {
         return highlight(this.policyText)
-      }
+      },
     },
     methods: {
       toggleClass($dom, className) {
@@ -106,16 +109,18 @@
       },
       // 合同事件处理 执行合同
       executeContractHandler(params) {
-        console.log('params --', params, eventComponentMap[params.type])
         switch (params.type) {
-          case 'escrowConfiscated':
           case 'signingEvent':
-          case 'transactionEvent': {
-            const eventComConfig = eventComponentMap[params.type]
+          case 'transactionEvent':
+          case 'escrowExceedAmount':
+          case 'escrowConfiscated':
+          case 'escrowRefunded': {
+            const { componentName, title } = eventComponentMap[params.type]
             this.targetContractEvent = params
-            this.eventComponent = eventComConfig.type
-            this.modalTitle = eventComConfig.title
+            this.eventComponent = componentName
+            this.dialogTitle = title
             this.showEventExecDialog = true
+            console.log('params --', params, componentName, title)
             break
           }
           default: {
@@ -160,8 +165,8 @@
       escrowExceedAmount(code, params, eventId) {
 
         const options = Object.assign({}, params, {
-          type: 'transactionEvent',
-          payType: 'escrowExceedAmount',
+          type: 'escrowExceedAmount',
+          payType: 'escrowExceed',
           eventId,
           amount: params.amount.literal,
           contractId: this.contractId
@@ -172,6 +177,7 @@
       escrowConfiscated(code, params, eventId) {
         const options = Object.assign({}, params, {
           type: 'escrowConfiscated',
+          payType: 'escrowConfiscated',
           eventId,
           contractId: this.contractId
         })
@@ -179,36 +185,17 @@
       },
       // 保证金赎回
       escrowRefunded(code, params, eventId) {
-        this.$confirm('是否确定赎回保证金？')
-          .then(() => {
-            this.$axios.post('/v1/contracts/events/escrowRefunded', {
-              contractId: this.contractId,
-              eventId,
-            })
-              .then((resp) => {
-                if (resp.status === 200) {
-                  if (resp.data.errcode === 0) {
-                    this.$emit('execute', {
-                      payType: 'escrowConfiscated',
-                      contractId: this.contractId,
-                      eventId
-                    })
-                    console.log('Escrow has been refunded success!')
-                  } else {
-                    console.log(`Escrow has been refunded fail! error: ${resp.data.msg}`)
-                  }
-                } else {
-                  console.log('/v1/contracts/events/escrowRefunded 请求失败！')
-                }
-              })
-              .catch((e) => {
-
-              })
-          })
+        const options = Object.assign({}, params, {
+          type: 'escrowRefunded',
+          payType: 'escrowRefunded',
+          eventId,
+          partyTwoUserId: this.partyTwoUserId,
+          contractId: this.contractId
+        })
+        this.executeContractHandler(options)
       },
       cycleEndEvent(code, params, eventId) {},
-      customEvent(code, params, eventId) {
-      },
+      customEvent(code, params, eventId) { },
       closeDialogHandler({ shouldUpdate }) {
         this.showEventExecDialog = false
         if(shouldUpdate) {

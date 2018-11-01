@@ -1,25 +1,31 @@
-import EscrowConfiscate from './escrow/confiscate'
 import LicenseEvent from './license/license'
 import TransactionEvent from './transaction/transaction'
 
 const eventComponentMap = {
   transactionEvent: {
-    type: TransactionEvent.name,
+    componentName: TransactionEvent.name,
     title: '支付'
   },
   signingEvent: {
-    type: LicenseEvent.name,
+    componentName: LicenseEvent.name,
     title: '协议签署'
   },
+  escrowExceedAmount: {
+    componentName: TransactionEvent.name,
+    title: '保证金支付'
+  },
   escrowConfiscated: {
-    type: EscrowConfiscate.name,
+    componentName: TransactionEvent.name,
     title: '保证金没收'
+  },
+  escrowRefunded: {
+    componentName: TransactionEvent.name,
+    title: '保证金赎回'
   }
 }
 
 export {
   LicenseEvent,
   TransactionEvent,
-  EscrowConfiscate,
   eventComponentMap
 }
