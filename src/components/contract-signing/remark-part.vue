@@ -14,8 +14,8 @@
                 v-if="isEditRemark"
                 name="rcb-remak"
                 v-model="targetRemark"
-                rows="3"
-                @blur="updateRemark">
+                rows="2"
+                @blur.native="updateRemark">
         </textarea>
       <div v-else>{{targetRemark}}</div>
     </div>
@@ -70,7 +70,7 @@
 
                     Message.success(self.editType === 'add' ? '备注添加成功' : '备注修改成功')
                   }else {
-                    throw new Error(res.msg)
+                    return Promise.reject(res.msg)
                   }
                 })
                 .catch(Message.error)
@@ -108,7 +108,7 @@
       i{ font-weight: bold; }
     }
     .rcb-r-left {
-      width: 78px;
+      margin-right: 20px;
     }
     .rcb-r-right {
       flex: 1;

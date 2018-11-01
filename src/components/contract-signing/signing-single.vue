@@ -1,7 +1,6 @@
 <template>
   <div v-if="contracts.length">
     <div v-if="type ==='single'">
-      <div class="cutoff-line"></div>
       <div class="sc-content">
         <div class="sc-cont-header">
           {{presentableName}}
@@ -144,14 +143,6 @@
         color: #333;
       }
     }
-  }
-
-  .cutoff-line {
-    position: relative;
-    top: -20px;
-    height: 1px;
-    margin: 0 -20px;
-    background: #ddd;
   }
 
   .sc-content {
