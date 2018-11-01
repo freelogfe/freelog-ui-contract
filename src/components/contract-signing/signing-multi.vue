@@ -33,9 +33,8 @@
   import { Message } from 'element-ui'
   import ContractSigningSingle from './signing-single.vue'
 
-  import {
-    getContractState,
-  } from './common.js'
+  import { getContractState, } from './common.js'
+  import { getUserInfo } from "../../utils.js"
 
   export default {
     name: 'contract-signing-multi',
@@ -67,7 +66,8 @@
         return this.selectedPresentable.nodeId
       },
       userId() {
-        return this.selectedPresentable.userId
+        var userInfo = getUserInfo()
+        return userInfo && userInfo.userId
       },
       selectedResourceId() {
         return this.selectedPresentable.resourceId

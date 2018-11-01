@@ -98,6 +98,7 @@
   import ContractRemark from './remark-part.vue'
 
   import { getContractState } from './common.js'
+  import { getUserInfo } from "../../utils.js"
 
   export default {
     name: 'resource-contract',
@@ -130,7 +131,8 @@
     },
     computed: {
       userId() {
-        return this.presentable.userId
+        var userInfo = getUserInfo()
+        return userInfo && userInfo.userId
       },
       resourceId() {
         return this.presentable.resourceId

@@ -31,9 +31,8 @@
 <script>
   import { Message } from 'element-ui'
   import resourceContract from './signing-box.vue'
-  import {
-    getContractState,
-  } from './common.js'
+  import { getContractState, } from './common.js'
+  import { getUserInfo } from "../../utils.js"
 
   export default {
     name: 'contract-signing-single',
@@ -58,14 +57,24 @@
         contracts: [],
       }
     },
+    computed: {
+      // 节点资源名称
+      presentableName() {
+        return this.presentable.presentableName
+      },
+      userId() {
+        var userInfo = getUserInfo()
+        return userInfo && userInfo.userId
+      },
+    },
     methods: {
       reInitialData() {
         this.getContracts()
       },
       // 获取该资源的所有合同
       getContracts() {
-        const { resourceId, userId } = this.presentable
-        return this.$axios.get(`/v1/contracts/contractRecords?resourceIds=${resourceId}&partyTwo=${userId}`)
+        const { resourceId } = this.presentable
+        return this.$axios.get(`/v1/contracts/contractRecords?resourceIds=${resourceId}&partyTwo=${this.userId}`)
           .then(res => {
             if(res.data.errcode === 0) {
               return res.data.data
@@ -99,12 +108,6 @@
         this.dContractType = type
         this.dContractTagName = tagName
       }
-    },
-    computed: {
-      // 节点资源名称
-      presentableName() {
-        return this.presentable.presentableName
-      },
     },
     watch: {
       defaultContract() {
