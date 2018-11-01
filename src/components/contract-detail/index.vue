@@ -1,6 +1,6 @@
 <template>
   <div class="contract-detail-content-wrapper" v-if="contract.contractClause">
-    <div v-if="contract.status === 2">
+    <template v-if="contract.status === 2">
       <div
               v-html="contractDetail"
               @click="handlerProxy"
@@ -21,14 +21,14 @@
                 :params="targetContractEvent"
         ></component>
       </el-dialog>
-    </div>
+    </template>
     <pre class="policy-text" v-else>{{beautifulPolityText}}</pre>
   </div>
 </template>
 
 <script>
-  import { Dialog, MessageBox, Message } from 'element-ui'
-  import { highlight, beautify } from '@freelog/resource-policy-lang'
+  import {Dialog, MessageBox, Message} from 'element-ui'
+  import {highlight, beautify} from '@freelog/resource-policy-lang'
   import {
     LicenseEvent,
     TransactionEvent,
@@ -102,7 +102,7 @@
         if (this[handlerName]) {
           const transitionData = this.getStateTransitionData(dataset.transition)
           if (transitionData !== null) {
-            const { code, params, eventId } = transitionData
+            const {code, params, eventId} = transitionData
             this[handlerName](code, params, eventId)
           }
         }
@@ -115,7 +115,7 @@
           case 'escrowExceedAmount':
           case 'escrowConfiscated':
           case 'escrowRefunded': {
-            const { componentName, title } = eventComponentMap[params.type]
+            const {componentName, title} = eventComponentMap[params.type]
             this.targetContractEvent = params
             this.eventComponent = componentName
             this.dialogTitle = title
@@ -145,7 +145,8 @@
         })
         this.executeContractHandler(options)
       },
-      cycleEndEvent(code, params, eventId) {},
+      cycleEndEvent(code, params, eventId) {
+      },
       // 交易事件
       transactionEvent(code, params, eventId) {
         const options = Object.assign({}, params, {
@@ -157,10 +158,14 @@
         })
         this.executeContractHandler(options)
       },
-      settlementEvent(code, params, eventId) {},
-      viewCountEvent(code, params, eventId) {},
-      recontractCountEvent(code, params, eventId) {},
-      presentCountEvent(code, params, eventId) {},
+      settlementEvent(code, params, eventId) {
+      },
+      viewCountEvent(code, params, eventId) {
+      },
+      recontractCountEvent(code, params, eventId) {
+      },
+      presentCountEvent(code, params, eventId) {
+      },
       // 收取保证金 - 弹窗 - 支付
       escrowExceedAmount(code, params, eventId) {
 
@@ -194,21 +199,23 @@
         })
         this.executeContractHandler(options)
       },
-      cycleEndEvent(code, params, eventId) {},
-      customEvent(code, params, eventId) { },
-      closeDialogHandler({ shouldUpdate }) {
+      cycleEndEvent(code, params, eventId) {
+      },
+      customEvent(code, params, eventId) {
+      },
+      closeDialogHandler({shouldUpdate}) {
         this.showEventExecDialog = false
-        if(shouldUpdate) {
-          this.$emit('update-contract', { shouldUpdate })
+        if (shouldUpdate) {
+          this.$emit('update-contract', {shouldUpdate})
         }
       }
     },
     created() {
-      if(!this.contract.contractClause){
+      if (!this.contract.contractClause) {
         this.$axios.get(`/v1/contracts/${this.contract.contractId}`)
           .then(resp => resp.data)
           .then(res => {
-            if(res.errcode === 0){
+            if (res.errcode === 0) {
               this.$emit('update:contract', res.data)
             }
           })
@@ -226,34 +233,40 @@
 <style lang="less" type="text/less">
 
   // policy 高亮
-  .beauty-poliycy-box{
+  .beauty-poliycy-box {
     min-width: 200px;
     display: inline-block;
-    font-size: 14px; line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.6;
     color: #999;
     overflow: hidden;
 
-    .bp-audience{ }
-    .bp-declaration, .bp-state, .bp-s-row:not(:first-child){
-      padding-left: 1em;
+    .bp-audience {
+    }
+    .bp-declaration, .bp-state, .bp-s-row:not(:first-child) {
+      padding-left: 20px;
     }
 
-
-
-    .bp-state.active{
-      margin-bottom: 5px; padding-right: 1em;
-      border: 1px solid #B3D7FF; border-radius: 20px;
-      color: #222; background: #E3F0FF;
+    .bp-state.active {
+      margin-bottom: 5px;
+      padding-right: 20px;
+      border: 1px solid #B3D7FF;
+      border-radius: 20px;
+      color: #222;
+      background: #E3F0FF;
     }
-    .bp-state.active .bp-s-transition{
+    .bp-state.active .bp-s-transition {
       color: #EE6723;
     }
 
-    .bp-state .bp-s-event{
+    .bp-state .bp-s-event {
       pointer-events: none;
     }
-    .bp-state.active .bp-s-event{
-      display: inline-block; cursor: pointer; color: #3e94f3; pointer-events: auto;
+    .bp-state.active .bp-s-event {
+      display: inline-block;
+      cursor: pointer;
+      color: #3e94f3;
+      pointer-events: auto;
     }
   }
 
