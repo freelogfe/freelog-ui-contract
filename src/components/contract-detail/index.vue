@@ -1,5 +1,5 @@
 <template>
-  <div class="contract-detail-content-wrapper" >
+  <div class="contract-detail-content-wrapper" v-if="contract.contractClause">
     <div v-if="contract.status === 2">
       <div
               v-html="contractDetail"
@@ -67,7 +67,7 @@
         return this.contract.contractClause.fsmStates
       },
       currentFsmState() {
-        return this.contract.contractClause.currentFsmState
+        return this.contract.contractClause && this.contract.contractClause.currentFsmState || 'none'
       },
       policyText() {
         return this.contract.contractClause.policyText
@@ -201,6 +201,17 @@
         if(shouldUpdate) {
           this.$emit('update-contract', { shouldUpdate })
         }
+      }
+    },
+    created() {
+      if(!this.contract.contractClause){
+        this.$axios.get(`/v1/contracts/${this.contract.contractId}`)
+          .then(resp => resp.data)
+          .then(res => {
+            if(res.errcode === 0){
+              this.$emit('update:contract', res.data)
+            }
+          })
       }
     },
     mounted() {
