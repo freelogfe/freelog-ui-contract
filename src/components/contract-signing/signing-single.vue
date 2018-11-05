@@ -1,30 +1,21 @@
 <template>
-  <div v-if="contracts.length">
-    <div v-if="type ==='single'">
-      <div class="sc-content">
-        <div class="sc-cont-header">
-          {{presentableName}}
-          <span
-                  :class="['sc-tag', `sc-tag-${dContractType}`]"
-          >{{dContractTagName}}</span>
-        </div>
-        <resource-contract
-                :defaultContract.sync="defaultContract"
-                :presentable="presentable">
-        </resource-contract>
+  <div class="ss-content">
+    <template v-if="type ==='single'">
+      <div class="ss-cont-header">
+        {{presentableName}}
+        <span
+                :class="['sc-tag', `sc-tag-${dContractType}`]"
+        >{{dContractTagName}}</span>
       </div>
-    </div>
-    <div v-else>
+    </template>
+    <template>
       <resource-contract
-              v-if="!!defaultContract"
+              v-if="isRenderResoureContract"
               :defaultContract.sync="defaultContract"
               :presentable="presentable">
       </resource-contract>
-    </div>
-
+    </template>
   </div>
-
-
 </template>
 
 <script>
@@ -50,6 +41,7 @@
     },
     data() {
       return {
+        isRenderResoureContract: false,
         defaultContract: null,
         dContractType: '',
         dContractTagName: '',
@@ -68,7 +60,9 @@
     },
     methods: {
       reInitialData() {
+        this.isRenderResoureContract = false
         this.getContracts()
+        this.$forceUpdate()
       },
       // 获取该资源的所有合同
       getContracts() {
@@ -86,6 +80,7 @@
             this.presentable.policy = this.presentable.policy.filter(p => p.status === 1)
             this.resolveContracts()
             this.resolveDefaultContractState()
+            this.isRenderResoureContract = true
           })
           .catch((e) => Message.error(e))
       },
@@ -101,6 +96,7 @@
         this.presentable.policy.forEach(p => {
           p.contract = map[p.segmentId] || null
         })
+        this.$set(this.presentable, this.presentable.policy)
       },
       resolveDefaultContractState() {
         const { type, tagName } = getContractState(this.defaultContract)
@@ -127,31 +123,12 @@
 </script>
 
 <style lang='less' scoped type="text/less">
-  .sc-fe-dislog-footer {
-    padding: 0 45px;
-    text-align: right;
 
-    .btn-normal {
-      padding: 10px 26px;
-      font-size: 14px;
-      border: none;
-      outline: 0;
-
-      &.btn-cancel {
-        color: #666;
-      }
-      &.btn-sign {
-        border: 1px solid #CECECE;
-        border-radius: 4px;
-        color: #333;
-      }
-    }
-  }
-
-  .sc-content {
+  .ss-content {
+    box-sizing: border-box;
     padding: 0 45px; text-align: left;
 
-    .sc-cont-header {
+    .ss-cont-header {
       padding: 5px 0 10px;
       border-bottom: 1px solid #eee;
       font-size: 16px;

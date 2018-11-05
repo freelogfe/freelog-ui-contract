@@ -1,6 +1,6 @@
 <template>
-  <div class="contract-detail-content-wrapper" v-if="contract.contractClause">
-    <template v-if="contract.status === 2">
+  <div class="contract-detail-content-wrapper" >
+    <template v-if="contract && contract.status === 2">
       <div
               v-html="contractDetail"
               @click="handlerProxy"
@@ -40,9 +40,12 @@
     name: 'contract-detail',
     props: {
       contract: {
-        type: Object,
+        // type: Object,
         required: true
-      }
+      },
+      policyText: {
+        type: String
+      },
     },
     components: {
       "el-dialog": Dialog,
@@ -69,9 +72,9 @@
       currentFsmState() {
         return this.contract.contractClause && this.contract.contractClause.currentFsmState || 'none'
       },
-      policyText() {
-        return this.contract.contractClause.policyText
-      },
+      // policyText() {
+      //   return this.contract.contractClause.policyText
+      // },
       beautifulPolityText() {
         return beautify(this.policyText)
       },
@@ -211,7 +214,7 @@
       }
     },
     created() {
-      if (!this.contract.contractClause) {
+      if (this.contract && !this.contract.contractClause) {
         this.$axios.get(`/v1/contracts/${this.contract.contractId}`)
           .then(resp => resp.data)
           .then(res => {
@@ -222,10 +225,10 @@
       }
     },
     mounted() {
-      this.highlightCurrentState()
+      this.contract && this.highlightCurrentState()
     },
     updated() {
-      this.highlightCurrentState()
+      this.contract && this.highlightCurrentState()
     }
   }
 </script>

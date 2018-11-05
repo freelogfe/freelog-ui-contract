@@ -1,13 +1,16 @@
 <template>
   <div class="rcb-remark" >
     <div class="rcb-r-left">
+      <template v-if="!isEditRemark">
         <span
                 v-if="currentRemark === ''"
                 class="rcb-add-remark"
                 id="rcb-remak"
                 @click="toggleEditRemark('add')"
-        > 添加备注 <i class="el-icon-plus"></i></span>
-      <span v-else  @click="toggleEditRemark('update')"> 备注 <i class="el-icon-edit-outline"></i></span>
+        >添加备注<i class="el-icon-plus"></i></span>
+        <span v-else  @click="toggleEditRemark('update')"> 修改备注 <i class="el-icon-edit-outline"></i></span>
+      </template>
+      <span v-else  @click="saveRemark('update')"> 保存备注</span>
     </div>
     <div class="rcb-r-right">
         <textarea
@@ -47,40 +50,26 @@
         this.editType = type
         this.currentRemark = this.targetRemark
       },
-      updateRemark(event) {
+      saveRemark() {
         var self = this
-        var remark = event.target.value
-        var msg = this.editType === 'add' ? '是否添加该备注？' : '是否更新该备注'
-
-        MessageBox.confirm(msg, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-          center: true,
-          callback(action) {
-            if(action === 'confirm') {
-              self.$axios.put(`/v1/contracts/${self.contract.contractId}`,{
-                remark
-              })
-                .then(res => res.data)
-                .then(res => {
-                  if(res.errcode === 0) {
-                    self.contract.remark = self.currentRemark = self.targetRemark = remark
-                    self.isEditRemark = false
-
-                    Message.success(self.editType === 'add' ? '备注添加成功' : '备注修改成功')
-                  }else {
-                    return Promise.reject(res.msg)
-                  }
-                })
-                .catch(Message.error)
-            }else {
-              self.isEditRemark = false
-              self.targetRemark = self.currentRemark
-            }
-          }
+        var remark = this.targetRemark
+        self.$axios.put(`/v1/contracts/${self.contract.contractId}`, {
+          remark
         })
-      }},
+          .then(res => res.data)
+          .then(res => {
+            if (res.errcode === 0) {
+              self.contract.remark = self.currentRemark = self.targetRemark = remark
+              self.isEditRemark = false
+
+              Message.success(self.editType === 'add' ? '备注添加成功' : '备注修改成功')
+            } else {
+              return Promise.reject(res.msg)
+            }
+          })
+          .catch(Message.error)
+      },
+    },
     watch: {
       contract (){
         this.currentRemark = this.targetRemark = this.contract.remark
@@ -95,20 +84,25 @@
 <style lang="less" type="text/less" scoped>
   .rcb-remark {
     display: flex;
-    height: 64px;
-    margin-top: 30px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #cecece;
     font-size: 14px;
     color: #222;
     font-weight: bold;
 
     .rcb-add-remark {
-      color: #3C99FC;
-      cursor: pointer;
 
       i{ font-weight: bold; }
     }
     .rcb-r-left {
+      color: #3C99FC;
       margin-right: 20px;
+
+      span {
+        display: inline-block;
+        cursor: pointer;
+      }
     }
     .rcb-r-right {
       flex: 1;

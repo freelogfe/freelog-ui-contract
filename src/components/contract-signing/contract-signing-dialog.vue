@@ -10,6 +10,7 @@
       资源签约<span>{{hostname}}</span>
     </div>
     <contract-signing-multi
+            :selectedIndex.sync="selectedIndex"
             v-if="presentableList.length"
             :presentableList="presentableList"
             @cancel-sign="cancelSign"
@@ -31,12 +32,16 @@
       },
       presentableList: {
         type: Array,
+      },
+      activeIndex: {
+        type: Number
       }
     },
     data() {
       return {
         isShowDialog: false,
-        callbackData: {}
+        callbackData: {},
+        selectedIndex: 0
       }
     },
     methods: {
@@ -61,6 +66,9 @@
     watch: {
       visible(newV) {
         this.isShowDialog = newV
+      },
+      activeIndex() {
+        this.selectedIndex = this.activeIndex
       }
     },
     beforeMount() {

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="contracts.length">
+  <div v-if="isRender">
     <div class="cutoff-line"></div>
     <div class="sc-content" style="min-height: 620px;">
       <div class="sc-left-box sc-resource-list">
@@ -10,7 +10,7 @@
               :key="'sc-item-' + (index + 1)"
               @click="selectedResource(index)">
             {{item.presentableName}}
-            <div class="sc-tag-box" v-if="item.c_contract">
+            <div class="sc-tag-box" >
               <span :class="['sc-tag', `sc-tag-${item.c_dContractType}`]">
                 {{item.c_dContractTagName}}
               </span>
@@ -46,10 +46,13 @@
         type: Array,
         required: true
       },
+      selectedIndex: {
+        type: Number,
+      }
     },
     data() {
       return {
-        selectedIndex: 0,
+        isRender: false,
         contracts: [],                  // 所有presentable的默认合同
         defaultContract: null,
         dContractType: '',
@@ -97,6 +100,7 @@
           .then((contracts) => {
             this.contracts = contracts
             this.resolveContracts()
+            this.isRender = true
           })
       },
       resolveContracts (){
@@ -120,7 +124,7 @@
         presentable.c_dContractTagName = tagName
       },
       selectedResource(index) {
-        this.selectedIndex = index
+        this.$emit('update:selectedIndex', index)
       },
       updateDefaultContract(contract) {
         this.selectedPresentable.c_contract = contract

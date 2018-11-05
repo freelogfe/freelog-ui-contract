@@ -12,40 +12,14 @@
       <label class="rcb-name">资源描述</label>
       <div class="rcb-value">{{resourceIntro}}</div>
     </div>
-    <div v-if="policyList.length">
-      <div class="rcb-tab-box">
-        <ul :class="{'disabled': isOpenContractRecordBox}">
-          <li
-                  class="rcb-tab-item"
-                  :class="{'active': index === actPolicyIndex}"
-                  v-for="(item, index) in policyList"
-                  :key="'rc-tab-'+(index+1)"
-                  @click="exchangePolicy(index)"
-          >{{item.policyName + (item.contract ? '(已签约)': '')}}
-          </li>
-        </ul>
-        <div
-                class="rcb-contract-record"
-                :class="{'disabled': contractRecords.length === 0, 'opened': isOpenContractRecordBox}"
-                @click="toggleContractRecordBox"
-        ></div>
-      </div>
-      <div class="rcb-tab-pane">
-        <div class="rcb-tp-contract-content">
-          <contract-detail
-                  v-if="!!selectedContract"
-                  :contract="selectedContract"
-                  @update-contract="closeModalHandler">
-          </contract-detail>
-        </div>
-        <div class="rcb-tp-status-bar">
-          {{sContractInfo}}
-          <div class="rcb-tp-sb-btn-box" v-if="actPolicy.contract">
-            <button class="rcb-tp-sb-default" v-if="selectedContract.isDefault">默认合约</button>
-            <button class="rcb-tp-sb-set-default" v-else @click="showConfirm('set-default-contract')">设为默认</button>
+    <div class="rcb-wrapper"  v-if="policyList.length">
+      <transition name="contract-record" >
+        <div class="rcb-tp-contract-record" v-show="isOpenContractRecordBox">
+          <div class="rcb-tp-cr-header">
+            <div class="rcb-tp-cr-btn"></div>
+            资源签约历史
+            <div class="rcb-tp-cr-close" @click="toggleContractRecordBox">&times;</div>
           </div>
-        </div>
-        <div class="rcb-tp-contract-record" :class="{'opened': isOpenContractRecordBox}">
           <table>
             <thead>
             <tr>
@@ -62,27 +36,57 @@
             </tr>
             </tbody>
           </table>
+          <div class="rcb-tp-cr-end" v-if="contractRecords.length === 0">-- 暂无记录 --</div>
+        </div>
+      </transition>
+      <div class="rcb-tab-box">
+        <ul :class="{'disabled': isOpenContractRecordBox}">
+          <li
+                  class="rcb-tab-item"
+                  :class="{'active': index === actPolicyIndex}"
+                  v-for="(item, index) in policyList"
+                  :key="'rc-tab-'+(index+1)"
+                  @click="exchangePolicy(index)"
+          >{{item.policyName + (item.contract ? '(已签约)': '')}}
+          </li>
+        </ul>
+        <div class="rcb-contract-record" @click="toggleContractRecordBox"></div>
+      </div>
+      <div class="rcb-tab-pane">
+        <div class="rcb-tp-contract-content">
+          <contract-detail
+                  :contract="selectedContract"
+                  :policyText="actPolicy.policyText"
+                  @update-contract="closeModalHandler">
+          </contract-detail>
+        </div>
+        <div class="rcb-tp-status-bar">
+          <contract-remark
+                  v-if="!!selectedContract"
+                  :contract="selectedContract"
+          ></contract-remark>
+          <contract-confirm
+                  :visible.sync="isShowConfirm"
+                  :presentableName="presentableName"
+                  :policyName="actPolicy.policyName"
+                  :confirmType="confirmType"
+                  @sure="confirmSure">
+          </contract-confirm>
+          <div style="line-height: 32px;" v-if="!!selectedContract">
+            {{sContractInfo}}
+            <div class="rcb-tp-sb-default" v-if="selectedContract.isDefault">当前活跃合约</div>
+            <button class="rcb-tp-sb-set-default" v-else @click="showConfirm('set-default-contract')">设为默认</button>
+          </div>
+
+          <div class="rcb-footer" v-else>
+            <button type="button"
+                    class="btn-normal btn-sign"
+                    :class="{'disabled': !!actPolicy.contract}"
+                    @click="showConfirm('sign-contract')">签约
+            </button>
+          </div>
         </div>
       </div>
-      <contract-remark
-              v-if="!!selectedContract"
-              :contract="selectedContract"
-      ></contract-remark>
-      <div class="rcb-footer">
-        <button type="button"
-                class="btn-normal btn-sign"
-                :class="{'disabled': !!actPolicy.contract}"
-                @click="showConfirm('sign-contract')">签约
-        </button>
-      </div>
-
-      <contract-confirm
-              :visible.sync="isShowConfirm"
-              :presentableName="presentableName"
-              :policyName="actPolicy.policyName"
-              :confirmType="confirmType"
-              @sure="confirmSure">
-      </contract-confirm>
     </div>
 
 
@@ -162,18 +166,18 @@
       init() {
         this.policyList = this.presentable.policy.map((p, index) => {
           p.resourceId = this.resourceId
-          if(p.contract.contractId === this.defaultContract.contractId) {
+          if(this.defaultContract && p.contract && p.contract.contractId === this.defaultContract.contractId) {
             this.actPolicyIndex = index
           }
           return p
         })
         this.getContractRecords()
+        this.exchangePolicy(this.actPolicyIndex)
 
       },
       // 切换策略
       exchangePolicy(index) {
         this.actPolicyIndex = index
-        this.selectedContract = this.policyList[index].contract
       },
       // 更新合同
       updateContract(contract) {

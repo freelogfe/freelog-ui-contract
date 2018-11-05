@@ -12,9 +12,9 @@ export function getContractState(contract) {
   switch (contract.status) {
     case 1:
     case 2:
-      return { type: 'inactive', tagName: '不可用', info: `合同ID ${contract.contractId}` }
+      return { type: 'inactive', tagName: '不可用', info: `合同ID：${contract.contractId}` }
     case 4:
-      return { type: 'active', tagName: '可用', info: `合同ID ${contract.contractId}` }
+      return { type: 'active', tagName: '可用', info: `合同ID：${contract.contractId}` }
     case 3:
     case 5:
     case 6:
