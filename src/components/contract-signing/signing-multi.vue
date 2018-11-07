@@ -133,7 +133,9 @@
       },
     },
     watch: {
-
+      presentableList(newV, oldV) {
+        this.resolveContracts()
+      },
     },
     beforeMount() {
       this.init()

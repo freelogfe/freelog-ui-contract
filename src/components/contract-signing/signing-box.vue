@@ -164,6 +164,7 @@
     },
     methods: {
       init() {
+
         this.policyList = this.presentable.policy.map((p, index) => {
           p.resourceId = this.resourceId
           if(this.defaultContract && p.contract && p.contract.contractId === this.defaultContract.contractId) {
