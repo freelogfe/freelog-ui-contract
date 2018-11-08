@@ -4,6 +4,7 @@ module.exports = {
     port: 9180,
     disableHostCheck: true,
     historyApiFallback: true,
+    hot: false,
   },
   crossorigin: 'anonymous',
   configureWebpack: {

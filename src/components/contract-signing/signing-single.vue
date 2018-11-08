@@ -66,8 +66,8 @@
       },
       // 获取该资源的所有合同
       getContracts() {
-        const { resourceId } = this.presentable
-        return this.$axios.get(`/v1/contracts/contractRecords?resourceIds=${resourceId}&partyTwo=${this.userId}`)
+        const { presentableId } = this.presentable
+        return this.$axios.get(`/v1/contracts/contractRecords?targetIds=${presentableId}&partyTwo=${this.userId}`)
           .then(res => {
             if(res.data.errcode === 0) {
               return res.data.data

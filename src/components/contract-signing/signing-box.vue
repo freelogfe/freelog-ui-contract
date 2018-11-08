@@ -172,7 +172,6 @@
           }
           return p
         })
-        this.getContractRecords()
         this.exchangePolicy(this.actPolicyIndex)
 
       },
@@ -302,6 +301,9 @@
       },
       toggleContractRecordBox() {
         this.isOpenContractRecordBox = !this.isOpenContractRecordBox
+        if(this.isOpenContractRecordBox) {
+          this.getContractRecords()
+        }
       },
       showToast(msg) {
         this.isShowToast = true
