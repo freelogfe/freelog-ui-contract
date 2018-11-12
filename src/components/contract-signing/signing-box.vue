@@ -70,6 +70,7 @@
                   :presentableName="presentableName"
                   :policyName="actPolicy.policyName"
                   :confirmType="confirmType"
+                  :is-default="policyList.length === 1"
                   @sure="confirmSure">
           </contract-confirm>
           <div style="line-height: 32px;" v-if="!!selectedContract">

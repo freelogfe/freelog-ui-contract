@@ -48,6 +48,7 @@
       },
       selectedIndex: {
         type: Number,
+        default: 0
       }
     },
     data() {
@@ -127,6 +128,13 @@
         this.$emit('update:selectedIndex', index)
       },
       updateDefaultContract(contract) {
+        if(this.selectedPresentable.c_contract) {
+          if(this.selectedPresentable.c_contract.status !== contract.status){
+            this.$emit('updated-contract')
+          }
+        }else{
+          this.$emit('updated-contract')
+        }
         this.selectedPresentable.c_contract = contract
         this.resolvePresentableC_Contract(this.selectedPresentable)
         this.presentableList.splice(this.selectedIndex, 1, this.selectedPresentable)
@@ -134,7 +142,7 @@
     },
     watch: {
       presentableList(newV, oldV) {
-        this.resolveContracts()
+        this.resolvePresentableC_Contract(this.selectedPresentable)
       },
     },
     beforeMount() {

@@ -72,14 +72,11 @@
       currentFsmState() {
         return this.contract.contractClause && this.contract.contractClause.currentFsmState || 'none'
       },
-      // policyText() {
-      //   return this.contract.contractClause.policyText
-      // },
       beautifulPolityText() {
-        return beautify(this.policyText)
+        return beautify(this.policyText || '')
       },
       contractDetail() {
-        return highlight(this.policyText)
+        return highlight(this.policyText || '')
       },
     },
     methods: {

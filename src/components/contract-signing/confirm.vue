@@ -16,7 +16,7 @@
           <div class="csn-presentable-name"><span>资源名称</span>&nbsp;&nbsp;&nbsp;&nbsp;{{presentableName}}</div>
           <div class="csn-policy-name">确认以&nbsp;&nbsp;&nbsp;&nbsp;{{policyName}}&nbsp;&nbsp;&nbsp;&nbsp;签约合约？</div>
           <div class="csn-set-default">
-            <el-checkbox v-model="isSetDefault">将此合约设定为默认合约</el-checkbox>
+            <el-checkbox v-model="isDefault">将此合约设定为默认合约</el-checkbox>
           </div>
         </div>
       </div>
@@ -49,23 +49,26 @@
       },
       policyName: {
         type: String
+      },
+      isDefault: {
+        type: Boolean,
+        default: false
       }
     },
     data() {
       return {
         isShowDialog: false,
-        isSetDefault: false
       }
     },
     methods: {
       toggleSetDefaultContract() {
-        this.isSetDefault = !this.isSetDefault
+        this.$emit('update:isDefault', !this.isDefault)
       },
       confirmCancel() {
         this.$emit('update:visible', false)
       },
       confirmSure() {
-        this.$emit('sure',{ isSetDefault: this.isSetDefault })
+        this.$emit('sure',{ isSetDefault: this.isDefault })
         this.$emit('update:visible', false)
       },
     },

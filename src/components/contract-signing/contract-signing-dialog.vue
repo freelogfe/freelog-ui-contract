@@ -14,6 +14,7 @@
             v-if="presentableList.length"
             :presentableList="presentableList"
             @cancel-sign="cancelSign"
+            @updated-contract="hadUpdatedContract"
     ></contract-signing-multi>
   </el-dialog>
 </template>
@@ -41,10 +42,15 @@
       return {
         isShowDialog: false,
         callbackData: {},
-        selectedIndex: 0
+        selectedIndex: 0,
+        lastContractChangeNumber: 0,
+        currentCOntractChangeNumber: 0
       }
     },
     methods: {
+      init() {
+        this.isShowDialog = this.visible
+      },
       cancelSign(data) {
         this.isShowDialog = false
         this.callbackData = data
@@ -52,11 +58,15 @@
       handleClose() {
         this.isShowDialog = false
         this.$emit('update:visible', false)
-        this.$emit('close-dialog', this.callbackData)
+        this.$emit('close-dialog', {
+          data: this.callbackData,
+          isUpdatedContract: this.currentCOntractChangeNumber !== this.lastContractChangeNumber
+        })
+        this.lastContractChangeNumber = this.currentCOntractChangeNumber
       },
-      init() {
-        this.isShowDialog = this.visible
-      },
+      hadUpdatedContract() {
+        this.currentCOntractChangeNumber += 1
+      }
     },
     computed: {
       hostname(){
