@@ -113,9 +113,13 @@
           }
           map[contract.resourceId] = contract
         })
+        this.resourceIdContractMap = map
 
+        this.resolvePretentableContract()
+      },
+      resolvePretentableContract() {
         this.presentableList.forEach(p => {
-          p.c_contract = map[p.resourceId] || null
+          p.c_contract = this.resourceIdContractMap[p.resourceId] || null
           this.resolvePresentableC_Contract(p)
         })
       },
@@ -135,6 +139,7 @@
         }else{
           this.$emit('updated-contract')
         }
+        this.resourceIdContractMap[contract.resourceId] = contract
         this.selectedPresentable.c_contract = contract
         this.resolvePresentableC_Contract(this.selectedPresentable)
         this.presentableList.splice(this.selectedIndex, 1, this.selectedPresentable)
@@ -142,7 +147,7 @@
     },
     watch: {
       presentableList(newV, oldV) {
-        this.resolvePresentableC_Contract(this.selectedPresentable)
+        this.resolvePretentableContract()
       },
     },
     beforeMount() {
