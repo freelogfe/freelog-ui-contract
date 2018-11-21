@@ -19,6 +19,7 @@ export default {
   },
   data() {
     return {
+      accountHref: '//' + window.location.host.replace(/^[^\.]+\./, 'www.') + '/accounts',
       accountOptions: [],
       accountId: '',
       password: '',

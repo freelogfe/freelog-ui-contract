@@ -35,7 +35,7 @@
         </el-select>
         <el-tooltip placement="top">
           <div slot="content">
-            <p><a style="color: white" href="//www.testfreelog.com/accounts" target="_blank">没有账号？去添加一个</a></p>
+            <p><a style="color: white" :href="accountHref" target="_blank">没有账号？去添加一个</a></p>
           </div>
           <i class="el-icon-question"></i>
         </el-tooltip>
