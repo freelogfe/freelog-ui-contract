@@ -34,7 +34,6 @@
     },
     watch: {
       visible(newV, oldV) {
-        console.log('watch toast-visible', newV, oldV)
         if(newV) {
           this.showToast()
         }else {

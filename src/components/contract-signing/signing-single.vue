@@ -125,7 +125,6 @@
 <style lang='less' scoped type="text/less">
 
   .ss-content {
-    overflow: hidden;
     box-sizing: border-box;
     padding: 0 45px; text-align: left;
 
