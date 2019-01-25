@@ -1,6 +1,6 @@
 <template>
   <div class="contract-detail-content-wrapper" >
-    <template v-if="contract && contract.status === 2">
+    <template v-if="contract && (contract.status === 2 || contract.status === 4)">
       <div
               v-html="contractDetail"
               @click="handlerProxy"
@@ -120,7 +120,6 @@
             this.eventComponent = componentName
             this.dialogTitle = title
             this.showEventExecDialog = true
-            console.log('params --', params, componentName, title)
             break
           }
           default: {
@@ -242,18 +241,16 @@
     overflow: hidden;
 
     .bp-audience {
+      margin-bottom: 10px;
     }
     .bp-declaration, .bp-state, .bp-s-row:not(:first-child) {
       padding-left: 20px;
     }
 
     .bp-state.active {
-      margin-bottom: 5px;
-      padding-right: 20px;
-      border: 1px solid #B3D7FF;
-      border-radius: 20px;
-      color: #222;
-      background: #E3F0FF;
+      min-width: 400px; margin-bottom: 5px; padding-right: 20px;
+      border: 1px solid #B3D7FF; border-radius: 20px;
+      background: #E3F0FF; color: #222;
     }
     .bp-state.active .bp-s-transition {
       color: #EE6723;
