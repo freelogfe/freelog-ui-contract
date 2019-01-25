@@ -248,7 +248,7 @@
     }
 
     .bp-state.active {
-      min-width: 400px; margin-bottom: 5px; padding-right: 20px;
+      min-width: 400px; margin-bottom: 5px; padding: 8px 20px;
       border: 1px solid #B3D7FF; border-radius: 20px;
       background: #E3F0FF; color: #222;
     }
