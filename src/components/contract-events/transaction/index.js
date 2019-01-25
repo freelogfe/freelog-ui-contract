@@ -1,5 +1,5 @@
 import ACCOUNT_CONFIG from '../../../config/account-types'
-import { Form, FormItem, Select, Tooltip, Button, Input, Option, Message } from 'element-ui'
+import {Form, FormItem, Select, Tooltip, Button, Input, Option, Message} from 'element-ui'
 
 
 export default {
@@ -14,8 +14,8 @@ export default {
     "el-option": Option
   },
   props: {
-    contractDetail: { type: Object },
-    params: {type: Object },
+    contractDetail: {type: Object},
+    params: {type: Object},
   },
   data() {
     return {
@@ -47,7 +47,8 @@ export default {
         case 'feather': {
           return this.params.amount || 0
         }
-        default: return 0
+        default:
+          return 0
       }
     },
     targAount() {
@@ -58,20 +59,22 @@ export default {
     },
     accountLabel() {
       switch (this.payType) {
-        case 'transaction': {}
+        case 'transaction': {
+        }
         case 'escrowExceed': {
           return '转出账号'
         }
-        case 'escrowConfiscated': {}
+        case 'escrowConfiscated': {
+        }
         case 'escrowConfiscated': {
           return '保证金转入账户'
         }
       }
     },
     isCanSubmit() {
-      if(this.isNeedPassword) {
+      if (this.isNeedPassword) {
         return this.accountId !== '' && this.password !== ''
-      }else {
+      } else {
         return this.accountId !== ''
       }
     },
@@ -79,7 +82,21 @@ export default {
   methods: {
     getPayCounts() {
       this.isLoadingAccount = true
-      this.$axios.get('v1/pay/accounts')
+      var currencyType
+      var currencyUnit = this.params && this.params.currencyUnit
+      switch (currencyUnit) {
+        case 'feather':
+          currencyType = 1;
+          break
+        default:
+          currencyType = 1;
+      }
+
+      this.$axios.get('v1/pay/accounts', {
+        params: {
+          currencyType: currencyType
+        }
+      })
         .then(resp => resp.data)
         .then((res) => {
           this.accountOptions = res.data
@@ -96,13 +113,21 @@ export default {
       var statusMsg = ''
       switch (this.params.payType) {
         // 交易
-        case 'transaction': statusMsg = '支付'; break;
+        case 'transaction':
+          statusMsg = '支付';
+          break;
         // 保证金支付
-        case 'escrowExceed': statusMsg = '保证金支付'; break;
+        case 'escrowExceed':
+          statusMsg = '保证金支付';
+          break;
         // 保证金没收
-        case 'escrowConfiscated': statusMsg = '保证金没收'; break;
+        case 'escrowConfiscated':
+          statusMsg = '保证金没收';
+          break;
         // 保证金赎回
-        case 'escrowConfiscated': statusMsg = '保证金赎回'; break;
+        case 'escrowConfiscated':
+          statusMsg = '保证金赎回';
+          break;
       }
 
       switch (result.status) {
@@ -150,10 +175,11 @@ export default {
     // 点击确认
     sure() {
       var promise = null
-      var { contractId, eventId, accountId, targAount, password } = this
+      var {contractId, eventId, accountId, targAount, password} = this
       switch (this.payType) {
         // 交易
-        case 'transaction': {}
+        case 'transaction': {
+        }
         // 保证金支付
         case 'escrowExceed': {
           promise = this.$axios.post('/v1/contracts/events/payment', {
@@ -185,13 +211,13 @@ export default {
         }
       }
 
-      if(promise !== null) {
+      if (promise !== null) {
         promise
           .then(resp => resp.data)
           .then((res) => {
             if (res.errcode === 0) {
               this.payResultHandler(res.data)
-              this.doneHandler({ shouldUpdate: true, data: res.data })
+              this.doneHandler({shouldUpdate: true, data: res.data})
             } else {
               Message.error(res.msg)
             }
