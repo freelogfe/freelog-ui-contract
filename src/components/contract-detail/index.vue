@@ -32,7 +32,7 @@
   import {
     LicenseEvent,
     TransactionEvent,
-    EscrowConfiscate,
+    // EscrowConfiscate,
     eventComponentMap
   } from '../contract-events/index'
 
@@ -49,7 +49,8 @@
     },
     components: {
       "el-dialog": Dialog,
-      TransactionEvent, LicenseEvent, EscrowConfiscate,
+      TransactionEvent, LicenseEvent,
+      // EscrowConfiscate,
     },
     data() {
       return {
