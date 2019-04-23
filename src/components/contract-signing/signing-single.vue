@@ -99,7 +99,7 @@
         this.$set(this.presentable, this.presentable.policy)
       },
       resolveDefaultContractState() {
-        const { type, tagName } = getContractState(this.defaultContract)
+        const { type, tagName } = getContractState.call(this, this.defaultContract)
         this.dContractType = type
         this.dContractTagName = tagName
       }

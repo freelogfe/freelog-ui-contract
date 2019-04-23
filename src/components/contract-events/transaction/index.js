@@ -19,7 +19,7 @@ export default {
   },
   data() {
     return {
-      accountHref: '//' + window.location.host.replace(/^[^\.]+\./, 'www.') + '/accounts',
+      accountHref: '//' + window.location.host.replace(/^[^\.]+\./, 'www.') + '/user/accounts',
       accountOptions: [],
       accountId: '',
       password: '',
@@ -30,6 +30,9 @@ export default {
     }
   },
   computed: {
+    formLabelWidth() {
+      return this.$i18n.locale === 'zh-CN' ? '90px' : '140px'
+    },
     contractId() {
       return this.contractDetail.contractId
     },
@@ -62,12 +65,12 @@ export default {
         case 'transaction': {
         }
         case 'escrowExceed': {
-          return '转出账号'
+          return this.$i18n.t('contractSigning.transaction.accountLabels[0]')
         }
         case 'escrowConfiscated': {
         }
         case 'escrowConfiscated': {
-          return '保证金转入账户'
+          return this.$i18n.t('contractSigning.transaction.accountLabels[1]')
         }
       }
     },
@@ -114,34 +117,34 @@ export default {
       switch (this.params.payType) {
         // 交易
         case 'transaction':
-          statusMsg = '支付';
+          statusMsg = this.$i18n.t('contractSigning.transaction.payResultMsgs[0]');
           break;
         // 保证金支付
         case 'escrowExceed':
-          statusMsg = '保证金支付';
+          statusMsg = this.$i18n.t('contractSigning.transaction.payResultMsgs[1]');
           break;
         // 保证金没收
         case 'escrowConfiscated':
-          statusMsg = '保证金没收';
+          statusMsg = this.$i18n.t('contractSigning.transaction.payResultMsgs[2]');
           break;
         // 保证金赎回
         case 'escrowConfiscated':
-          statusMsg = '保证金赎回';
+          statusMsg = this.$i18n.t('contractSigning.transaction.payResultMsgs[3]');
           break;
       }
 
       switch (result.status) {
         case 1:
-          Message.success(`${statusMsg}进行中，稍后查询结果`)
+          Message.success(statusMsg + this.$i18n.t('contractSigning.transaction.payResultMsgs[4]'))
           break
         case 2:
-          Message.success(`${statusMsg}成功`)
+          Message.success(statusMsg + this.$i18n.t('contractSigning.transaction.payResultMsgs[5]'))
           break
         case 3:
-          Message.success(`${statusMsg}失败`)
+          Message.success(statusMsg + this.$i18n.t('contractSigning.transaction.payResultMsgs[6]'))
           break
         default:
-          Message.info(`未知的支付状态`)
+          Message.info(this.$i18n.t('contractSigning.transaction.payResultMsgs[7]'))
       }
     },
     // 支付完成（即支付成功） 处理
@@ -160,13 +163,13 @@ export default {
       let msg
       switch (order.status) {
         case 1:
-          msg = '支付进行中'
+          msg = this.$i18n.t('contractSigning.transaction.orderStatus[0]')
           break
         case 2:
-          msg = '已支付成功'
+          msg = this.$i18n.t('contractSigning.transaction.orderStatus[1]')
           break
         case 3:
-          msg = '支付失败'
+          msg = this.$i18n.t('contractSigning.transaction.orderStatus[2]')
           break
       }
 

@@ -14,6 +14,11 @@ export default {
       licenses: []
     }
   },
+  computed: {
+    formLabelWidth() {
+      return this.$i18n.locale === 'zh-CN' ? '90px' : '140px'
+    },
+  },
   methods: {
     loadLicenses() {
       const promises = this.params.licenseIds.map(rid => this.loadLicenseContent(rid))
@@ -26,7 +31,7 @@ export default {
       return this.$axios.get(`/v1/auths/resource/${resourceId}.data`)
         .then((res) => {
           if(typeof res.data.errcode !== 'undefined' && res.data.errcode === 15) {
-            Message.warning('协议格式不正确，请联系合约作者。')
+            Message.warning(this.$i18n.t('license.msgs[0]'))
             return
           }
           return res.data
@@ -40,7 +45,7 @@ export default {
       }).then((res) => {
         if (res.data.errcode === 0) {
           this.doneHandler(true)
-          Message.success('执行成功')
+          Message.success(this.$i18n.t('license.msgs[1]'))
         } else {
           Message.error(res.data.msg)
         }

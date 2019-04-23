@@ -1,7 +1,7 @@
 <template>
   <div class="license-event-wrap">
-    <el-form label-position="left" class="small-el-form" label-width="80px" :model="contractDetail">
-      <el-form-item label="协议" class="no-margin-bottom">
+    <el-form label-position="left" class="small-el-form" :label-width="formLabelWidth" :model="contractDetail">
+      <el-form-item :label="$('license.label')" class="no-margin-bottom">
         <div class="license-window">
           <pre class="license-format" v-for="license in licenses">
             {{license}}
@@ -9,12 +9,12 @@
         </div>
       </el-form-item>
       <el-form-item>
-        <el-checkbox class="accept-license" v-model="accepted">接受协议</el-checkbox>
+        <el-checkbox class="accept-license" v-model="accepted">{{$('license.checkboxText')}}</el-checkbox>
       </el-form-item>
 
         <div class="center">
-          <el-button @click="doneHandler">取 消</el-button>
-          <el-button type="primary" :disabled="!accepted" @click="signHandler">确 定</el-button>
+          <el-button @click="doneHandler">{{$('common.cancelBtnText')}}</el-button>
+          <el-button type="primary" :disabled="!accepted" @click="signHandler">{{$('common.sureBtnText')}}</el-button>
         </div>
     </el-form>
   </div>

@@ -1,7 +1,7 @@
 <template>
     <el-dialog
             center
-            title="提示"
+            :title="$t('contractSigning.confirm.title')"
             width="440px"
             top="25vh"
             :visible.sync="isShowDialog"
@@ -10,20 +10,20 @@
     >
       <div class="rcb-confirm-cont">
         <div class="confirm-set-default-contract" v-if="confirmType === 'set-default-contract'">
-          将当前合约设置为默认合约？
+          {{$t('contractSigning.confirm.content_default')}}
         </div>
         <div class="confirm-sign-contract" v-if="confirmType === 'sign-contract'">
-          <div class="csn-presentable-name"><span>资源名称</span>&nbsp;&nbsp;&nbsp;&nbsp;{{presentableName}}</div>
-          <div class="csn-policy-name">确认以&nbsp;&nbsp;&nbsp;&nbsp;{{policyName}}&nbsp;&nbsp;&nbsp;&nbsp;签约合约？</div>
+          <div class="csn-presentable-name"><span>{{$t('contractSigning.confirm.resourceName')}}</span>&nbsp;&nbsp;&nbsp;&nbsp;{{presentableName}}</div>
+          <div class="csn-policy-name">{{$t('contractSigning.confirm.content_sign[0]')}}&nbsp;&nbsp;&nbsp;&nbsp;{{policyName}}&nbsp;&nbsp;&nbsp;&nbsp;{{$t('contractSigning.confirm.content_sign[1]')}}</div>
           <div class="csn-set-default">
-            <el-checkbox v-model="isDefault">将此合约设定为默认合约</el-checkbox>
+            <el-checkbox v-model="isDefault">{{$t('contractSigning.confirm.checkboxText')}}</el-checkbox>
           </div>
         </div>
       </div>
       <div slot="footer">
         <div class="rcb-confirm-btn-box">
-          <button class="cbb-btn cbb-cancel" @click="confirmCancel">取消</button>
-          <button class="cbb-btn cbb-sure" @click="confirmSure">确认</button>
+          <button class="cbb-btn cbb-cancel" @click="confirmCancel">{{$t('contractSigning.confirm.cancelBtnText')}}</button>
+          <button class="cbb-btn cbb-sure" @click="confirmSure">{{$t('contractSigning.confirm.sureBtnText')}}</button>
         </div>
       </div>
     </el-dialog>

@@ -7,7 +7,7 @@
           @close="handleClose"
   >
     <div slot="title" class="contract-dialog-title">
-      资源签约<span>{{hostname}}</span>
+      {{$t('contractSigning.dialog.title')}}<span>{{hostname}}</span>
     </div>
     <contract-signing-multi
             :selectedIndex.sync="selectedIndex"

@@ -7,10 +7,10 @@
                 class="rcb-add-remark"
                 id="rcb-remak"
                 @click="toggleEditRemark('add')"
-        >添加备注<i class="el-icon-plus"></i></span>
-        <span v-else  @click="toggleEditRemark('update')"> 修改备注 <i class="el-icon-edit-outline"></i></span>
+        >{{$t('contractSigning.addRemark')}}<i class="el-icon-plus"></i></span>
+        <span v-else  @click="toggleEditRemark('update')"> {{$t('contractSigning.editRemark')}} <i class="el-icon-edit-outline"></i></span>
       </template>
-      <span v-else  @click="saveRemark('update')"> 保存备注</span>
+      <span v-else  @click="saveRemark('update')"> {{$t('contractSigning.saveRemark')}}</span>
     </div>
     <div class="rcb-r-right">
         <textarea
@@ -62,7 +62,7 @@
               self.contract.remark = self.currentRemark = self.targetRemark = remark
               self.isEditRemark = false
 
-              Message.success(self.editType === 'add' ? '备注添加成功' : '备注修改成功')
+              Message.success(self.editType === 'add' ? self.$i18n.t('contractSigning.addRemarkSuccessText') : self.$i18n.t('contractSigning.editRemarkSuccessText'))
             } else {
               return Promise.reject(res.msg)
             }

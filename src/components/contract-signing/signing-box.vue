@@ -1,15 +1,15 @@
 <template>
   <div class="ss-main-content resource-contract-box">
     <div class="rcb-id-box">
-      <label class="rcb-name">资源ID</label>
+      <label class="rcb-name">{{$t('contractSigning.resourceId')}}:</label>
       <div class="rcb-value">{{resourceId}}</div>
     </div>
     <div class="rcb-type-box">
-      <label class="rcb-name">资源类型</label>
+      <label class="rcb-name">{{$t('contractSigning.resourceType')}}:</label>
       <div class="rcb-value">{{resourceType}}</div>
     </div>
     <div class="rcb-intro-box" v-if="false">
-      <label class="rcb-name">资源描述</label>
+      <label class="rcb-name">{{$t('contractSigning.resourceIntro')}}:</label>
       <div class="rcb-value">{{resourceIntro}}</div>
     </div>
     <div class="rcb-wrapper"  v-if="policyList.length">
@@ -17,15 +17,15 @@
         <div class="rcb-tp-contract-record" v-show="isOpenContractRecordBox">
           <div class="rcb-tp-cr-header">
             <div class="rcb-tp-cr-btn"></div>
-            资源签约历史
+            {{$t('contractSigning.recordsText')}}
             <div class="rcb-tp-cr-close" @click="toggleContractRecordBox">&times;</div>
           </div>
           <table>
             <thead>
             <tr>
-              <th>合约ID</th>
-              <th>策略名称</th>
-              <th>签约时间</th>
+              <th>{{$t('contractSigning.contractId')}}</th>
+              <th>{{$t('contractSigning.policyName')}}</th>
+              <th>{{$t('contractSigning.signDate')}}</th>
             </tr>
             </thead>
             <tbody>
@@ -36,7 +36,7 @@
             </tr>
             </tbody>
           </table>
-          <div class="rcb-tp-cr-end" v-if="contractRecords.length === 0">-- 暂无记录 --</div>
+          <div class="rcb-tp-cr-end" v-if="contractRecords.length === 0">-- {{$t('contractSigning.noRecordText')}} --</div>
         </div>
       </transition>
       <div class="rcb-tab-box">
@@ -47,7 +47,7 @@
                   v-for="(item, index) in policyList"
                   :key="'rc-tab-'+(index+1)"
                   @click="exchangePolicy(index)"
-          >{{item.policyName + (item.contract ? '(已签约)': '')}}
+          >{{item.policyName + (item.contract ? '('+ $t('contractSigning.status[1]') +')': '')}}
           </li>
         </ul>
         <div class="rcb-contract-record" @click="toggleContractRecordBox"></div>
@@ -75,15 +75,15 @@
           </contract-confirm>
           <div style="line-height: 32px;" v-if="!!selectedContract">
             {{sContractInfo}}
-            <div class="rcb-tp-sb-default" v-if="selectedContract.isDefault">当前活跃合约</div>
-            <button class="rcb-tp-sb-set-default" v-else @click="showConfirm('set-default-contract')">设为默认</button>
+            <div class="rcb-tp-sb-default" v-if="selectedContract.isDefault">{{$t('contractSigning.activeBtnText')}}</div>
+            <button class="rcb-tp-sb-set-default" v-else @click="showConfirm('set-default-contract')">{{$t('contractSigning.defaultBtnText')}}</button>
           </div>
 
           <div class="rcb-footer" v-else>
             <button type="button"
                     class="btn-normal btn-sign"
                     :class="{'disabled': !!actPolicy.contract}"
-                    @click="showConfirm('sign-contract')">签约
+                    @click="showConfirm('sign-contract')">{{$t('contractSigning.signBtnText')}}
             </button>
           </div>
         </div>
@@ -156,7 +156,7 @@
         get() {
           var actPolicy = this.policyList[this.actPolicyIndex]
           this.selectedContract = actPolicy.contract
-          const { info } = getContractState(this.selectedContract)
+          const { info } = getContractState.call(this, this.selectedContract)
           this.sContractInfo = info
 
           return actPolicy
@@ -219,17 +219,18 @@
           .then((res) => {
             if (res.errcode === 0) {
               const contract = res.data
-              this.showToast('签约中...')
+              this.showToast(this.$i18n.t('contractSigning.toastText'))
               this.queryContractState(contract.contractId)
             } else {
               throw new Error(res.msg)
             }
           })
           .catch((e) => {
+            const msg = this.$i18n.t('contractSigning.errors[0]')
             Message({
               type: 'error',
               showClose: true,
-              message: '签约失败，稍后再试！！！' + e
+              message: msg + e
             })
           })
       },
@@ -265,10 +266,11 @@
             }
           })
           .catch(() => {
+            const errorText = this.$i18n.t('contractSigning.errors[1]')
             Message({
               type: 'error',
               showClose: true,
-              message: '设置默认合同失败，稍后再试！！！'
+              message: errorText
             })
           })
       },

@@ -124,7 +124,7 @@
         })
       },
       resolvePresentableC_Contract(presentable) {
-        const { type, tagName } = getContractState(presentable.c_contract)
+        const { type, tagName } = getContractState.call(this, presentable.c_contract)
         presentable.c_dContractType = type
         presentable.c_dContractTagName = tagName
       },

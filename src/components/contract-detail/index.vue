@@ -116,10 +116,10 @@
           case 'escrowExceedAmount':
           case 'escrowConfiscated':
           case 'escrowRefunded': {
-            const {componentName, title} = eventComponentMap[params.type]
+            const { componentName } = eventComponentMap[params.type]
             this.targetContractEvent = params
             this.eventComponent = componentName
-            this.dialogTitle = title
+            this.dialogTitle = this.$t(`contractSigning.eventTitles['${params.type}']`)
             this.showEventExecDialog = true
             break
           }

@@ -2,25 +2,32 @@ export function resolvePresentableDefaultContractState(presentable, resourceIdCo
   const { index, defaultContract } = getHasDefaultContractPolicyIndex(presentable, resourceIdContractsMap)
   presentable.DC_policyIndex = index
   presentable._defaultContract = defaultContract
-  presentable.contractState = getContractState(defaultContract)
+  presentable.contractState = getContractState.call(this, defaultContract)
 }
 // 根据合同获取 资源标签状态
 export function getContractState(contract) {
+  const $i18n = this.$i18n
+  const [ nosign, inactive, active, terminate ] = [
+    $i18n.t('contractSigning.status[0]'),
+    $i18n.t('contractSigning.status[2]'),
+    $i18n.t('contractSigning.status[3]'),
+    $i18n.t('contractSigning.status[4]'),
+  ]
   if (!contract) {
-    return { type: 'nosign', tagName: '未签约', info: '未签约' }
+    return { type: 'nosign', tagName: nosign, info: nosign }
   }
   switch (contract.status) {
     case 1:
     case 2:
-      return { type: 'inactive', tagName: '不可用', info: `合同ID：${contract.contractId}` }
+      return { type: 'inactive', tagName: inactive, info: $i18n.t('contractSigning.contractId') + `：${contract.contractId}` }
     case 4:
-      return { type: 'active', tagName: '可用', info: `合同ID：${contract.contractId}` }
+      return { type: 'active', tagName: active, info: $i18n.t('contractSigning.contractId') + `：${contract.contractId}` }
     case 3:
     case 5:
     case 6:
-      return { type: 'terminate', tagName: '合同终止', info: '合同终止' }
+      return { type: 'terminate', tagName: terminate, info: terminate }
     default:
-      return { type: 'nosign', tagName: '未签约', info: '未签约' }
+      return { type: 'nosign', tagName: nosign, info: nosign }
   }
 }
 

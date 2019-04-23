@@ -1,28 +1,28 @@
 <template>
   <div class="transaction-wrap">
 
-    <el-form label-position="left" class="small-el-form" label-width="120px" :model="contractDetail">
-      <el-form-item label="合同ID">
+    <el-form label-position="left" class="small-el-form" :label-width="formLabelWidth" :model="contractDetail">
+      <el-form-item :label="$t('contractSigning.transaction.contractId')">
         {{contractDetail.contractId}}
       </el-form-item>
-      <el-form-item label="甲方">
+      <el-form-item :label="$t('contractSigning.transaction.partyOne')">
         {{contractDetail.partyOne}}
       </el-form-item>
-      <el-form-item label="乙方">
+      <el-form-item :label="$t('contractSigning.transaction.partyTwo')">
         {{contractDetail.partyTwo}}
       </el-form-item>
-      <el-form-item label="转入账号" v-if="false">
+      <el-form-item :label="$t('contractSigning.transaction.contractAccountName')" v-if="false">
         {{params.contractAccountName}}
       </el-form-item>
-      <el-form-item label="转账金额" v-if="amount !== 0">
+      <el-form-item :label="$t('contractSigning.transaction.unitType')" v-if="amount !== 0">
         {{amount}} {{unitType}}
       </el-form-item>
       <el-form-item :label="accountLabel">
         <el-select
                 :loading="isLoadingAccount"
-                loading-text="正在获取账户中..."
+                :loading-text="$t('contractSigning.transaction.loadingAccountText')"
                 size="small"
-                placeholder="请选择"
+                :placeholder="$t('contractSigning.transaction.accountPlaceholder')"
                 v-model="accountId"
                 @visible-change="selectVisibleChange"
         >
@@ -35,18 +35,18 @@
         </el-select>
         <el-tooltip placement="top">
           <div slot="content">
-            <p><a style="color: white" :href="accountHref" target="_blank">没有账号？去添加一个</a></p>
+            <p><a style="color: white" :href="accountHref" target="_blank">{{$t('contractSigning.transaction.noAccountTip')}}</a></p>
           </div>
           <i class="el-icon-question"></i>
         </el-tooltip>
       </el-form-item>
-      <el-form-item label="支付密码" class="t-password" v-if="isNeedPassword">
+      <el-form-item :label="$t('contractSigning.transaction.password')" class="t-password" v-if="isNeedPassword">
         <el-input type="password" size="small" style="max-width: 300px;" v-model="password"
-                  placeholder="请输入支付密码"></el-input>
+                  :placeholder="$t('contractSigning.transaction.passwordPlaceholder')"></el-input>
       </el-form-item>
       <el-form-item class="button-group">
-        <el-button @click="doneHandler">取 消</el-button>
-        <el-button type="primary" @click="sure" :disabled="!isCanSubmit">确 定</el-button>
+        <el-button @click="doneHandler">{{$t('common.cancelBtnText')}}</el-button>
+        <el-button type="primary" @click="sure" :disabled="!isCanSubmit">{{$t('common.sureBtnText')}}</el-button>
       </el-form-item>
     </el-form>
   </div>
